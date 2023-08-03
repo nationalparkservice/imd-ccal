@@ -8,6 +8,13 @@
 \description{
 More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://nationalparkservice.github.io/imd-ccal/}
+}
+
+}
 \author{
 \strong{Maintainer}: Sarah Wright \email{sarah_wright@nps.gov} (\href{https://orcid.org/0009-0004-5060-2189}{ORCID})
 

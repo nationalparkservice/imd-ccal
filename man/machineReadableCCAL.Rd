@@ -30,7 +30,7 @@ Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx
 \dontrun{
 ccal_folder <- "ccal_results"
 dest_folder <- "ccal_results/tidied"
-file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
+file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
 machineReadableCCAL(file_list, format = "xlsx", destination_folder = dest_folder)
 machineReadableCCAL(file_list, format = "csv", destination_folder = dest_folder)
 }
