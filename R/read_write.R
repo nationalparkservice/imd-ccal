@@ -75,7 +75,7 @@ getCCALData <- function(files) {
       dplyr::select(sheet, address, row, col, is_blank, character) %>%
       dplyr::filter(row > quest_results_row, col == quest_results_col, character != "", !is.na(character)) %>%
       dplyr::select(character) %>%
-      dplyr::mutate(lab_number = stringr::str_extract(character, "#.*is "),
+      dplyr::mutate(lab_number = stringr::str_extract(character, "#[^(is)]* is "),
                     lab_number = trimws(stringr::str_replace_all(lab_number, "(#|,|&|(is))", "")),
                     lab_number = stringr::str_replace_all(lab_number, "[ \t\r\n]+", " "),
                     param_description = stringr::str_extract(character, "Concentration of .* for sample"),
