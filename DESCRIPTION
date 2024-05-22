@@ -1,12 +1,15 @@
 Package: imdccal
 Type: Package
 Title: Wrangle CCAL Data Into Machine Readable Format
-Version: 0.1.0
+Version: 0.1.2
 Authors@R: 
     person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-5060-2189"))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: This package takes water quality data spreadsheets (.xlsx) as 
+    delivered by the CCAL lab and reads them into R, including all metadata
+    provided. Data can be exported to machine readable CSV or XLSX files that 
+    can easily be analyzed, imported into database tables, or added to an NPS 
+    data package for publication.
 License: CC0
 Encoding: UTF-8
 LazyData: true
