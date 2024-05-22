@@ -6,7 +6,7 @@
 \alias{imdccal-package}
 \title{imdccal: Wrangle CCAL Data Into Machine Readable Format}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication.
 }
 \seealso{
 Useful links:
