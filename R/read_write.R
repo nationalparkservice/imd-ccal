@@ -113,7 +113,7 @@ getCCALData <- function(files) {
     # Extract chem results
     data <- suppressMessages(readxl::read_excel(file, sheet = 2, skip = 3, col_names = TRUE))
     first_chem_col <- max(grep("delivery\\s*date", names(data), ignore.case = TRUE), grep("date\\s*filtered", names(data), ignore.case = TRUE)) + 1  # Get index of first chem data column
-    last_date_col <- max(grep("^date\\.\\.\\.\\d+$", names(data), ignore.case = TRUE))
+    last_date_col <- max(grep("^date(\\.\\.\\.\\d+){0,1}$", names(data), ignore.case = TRUE))
     names(data) <- trimws(names(data))
     data <- data %>%
       tidyr::pivot_longer(first_chem_col:last_date_col, names_to = "param") %>%
