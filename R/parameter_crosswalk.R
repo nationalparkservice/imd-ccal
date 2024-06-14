@@ -11,6 +11,7 @@ getParamCrosswalk <- function(description) {
                  "unfiltered total nitrogen" = "UTN",
                  "unfiltered total phosphorus" = "UTP",
                  "inorganic nitrogen" = "NO3-N+NO2-N",
+                 "nitrate+nitrite nitrogen" = "NO3-N+NO2-N",
                  "nitrate nitrogen" = "NO3",
                  "orthophosphorus" = "PO4-P")
 
