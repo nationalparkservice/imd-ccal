@@ -1,48 +1,22 @@
-#' Clean and flag CCAL data
-#'
-#' @param file_path Path to .xlsx file delivered by CCAL.
-#'
-#' @return The data with duplicate observations removed and flags added
-#' @export
-#'
-#' @examples
-#' add something here?!?!
-clean_and_flag <- function(file_path) {
+handle_duplicates <- function(data) {
 
-  # ------------------------
-  #  Load data to work with in R
-  # ------------------------
-
-  # Tidy data to list in R
-  package_all <- getCCALData(file_path)
-
-  # Store individual tables
-  package_data <- package_all[[1]][[1]] # Get the data for a single set of lab results
-  package_metadata <- package_all[[1]][[2]] # Get the metadata
-  package_questionable <- package_all[[1]][[4]] # Get the questionable table
-  package_samples <- package_all[[1]][[3]] # Get samples table
-
-  # ------------------------
-  # DATA CLEANING
-  # ------------------------
-
-  # Drop duplicates (Not needed for EQuIS. Available in raw deliverable)
-  package_data <- package_data %>%
+  # Drop lab duplicates
+  data <- data %>%
     dplyr::filter(is.na(repeat_measurement))
 
   # Concatenate duplicated rows due to different qa flags from CCAL
-  package_data <- package_data %>%
+  data <- data %>%
     dplyr::group_by(dplyr::across(-c(qa_description, qa_within_precision_limits))) %>%
     dplyr::summarise(qa_description = paste(qa_description, collapse = "... ")) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(qa_description = dplyr::if_else(qa_description == "NA", NA, qa_description)) # fix NA handling issue
 
-  # ------------------------
-  # ASSIGN FLAGS
-  # ------------------------
+  return(data)
+}
 
+assign_flags <- function(data) {
   # Define constants
-  package_data$flag <- NA
+  data$flag <- NA
 
   utp_mdl <- limits %>%
     dplyr::filter(ccal_code == "UTP") %>%
@@ -76,87 +50,87 @@ clean_and_flag <- function(file_path) {
     dplyr::filter(ccal_code == "NO3") %>%
     dplyr::select(method_detection_limit)
 
-  # Loop over every row of package_data to define NFNSU and NFNSI flags
-  for(i in 1:nrow(package_data)) {
+  # Loop over every row of data to define NFNSU and NFNSI flags
+  for(i in 1:nrow(data)) {
     # Assign NFNSU and NFNSI flags for orthophosphorus
-    if (package_data[i,]$parameter == "PO4-P") {
-      utp <- package_data %>%
-        dplyr::filter(lab_number == package_data[i,]$lab_number, parameter == "UTP") %>%
+    if (data[i,]$parameter == "PO4-P") {
+      utp <- data %>%
+        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTP") %>%
         dplyr::select(value)
 
-      tdp <- package_data %>%
-        dplyr::filter(lab_number == package_data[i,]$lab_number, parameter == "TDP") %>%
+      tdp <- data %>%
+        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "TDP") %>%
         dplyr::select(value)
 
-      if ( ((package_data[i,]$value - utp) %>>% (utp_mdl + po4p_mdl)) | ((package_data[i,]$value - tdp) %>>% (tdp_mdl + po4p_mdl)) )  { #
-        package_data[i,]$flag = "NFNSU"
+      if ( ((data[i,]$value - utp) %>>% (utp_mdl + po4p_mdl)) | ((data[i,]$value - tdp) %>>% (tdp_mdl + po4p_mdl)) )  { #
+        data[i,]$flag = "NFNSU"
       }
-      else if ( ((package_data[i,]$value - utp) %>>% 0) | ((package_data[i,]$value - tdp) %>>% 0) ) {
-        package_data[i,]$flag = "NFNSI"
+      else if ( ((data[i,]$value - utp) %>>% 0) | ((data[i,]$value - tdp) %>>% 0) ) {
+        data[i,]$flag = "NFNSI"
       }
     }
     # Assign NFNSU and NFNSI flags for total dissolved phosphorus
-    else if (package_data[i,]$parameter == "TDP") {
-      utp <- package_data %>%
-        dplyr::filter(lab_number == package_data[i,]$lab_number, parameter == "UTP") %>%
+    else if (data[i,]$parameter == "TDP") {
+      utp <- data %>%
+        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTP") %>%
         dplyr::select(value)
 
-      if ( (package_data[i,]$value - utp) %>>% (utp_mdl + tdp_mdl) )  { #
-        package_data[i,]$flag = "NFNSU"
+      if ( (data[i,]$value - utp) %>>% (utp_mdl + tdp_mdl) )  { #
+        data[i,]$flag = "NFNSU"
       }
-      else if ( (package_data[i,]$value - utp) %>>% 0) {
-        package_data[i,]$flag = "NFNSI"
+      else if ( (data[i,]$value - utp) %>>% 0) {
+        data[i,]$flag = "NFNSI"
       }
     }
     # Assign NFNSU and NFNSI flags for total dissolved nitrogen
-    else if (package_data[i,]$parameter == "TDN") {
-      utn <- package_data %>%
-        dplyr::filter(lab_number == package_data[i,]$lab_number, parameter == "UTN") %>%
+    else if (data[i,]$parameter == "TDN") {
+      utn <- data %>%
+        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTN") %>%
         dplyr::select(value)
 
-      if ( (package_data[i,]$value - utn) %>>% (utn_mdl + tdn_mdl) )  { #
-        package_data[i,]$flag = "NFNSU"
+      if ( (data[i,]$value - utn) %>>% (utn_mdl + tdn_mdl) )  { #
+        data[i,]$flag = "NFNSU"
       }
-      else if ( (package_data[i,]$value - utn) %>>% 0) {
-        package_data[i,]$flag = "NFNSI"
+      else if ( (data[i,]$value - utn) %>>% 0) {
+        data[i,]$flag = "NFNSI"
       }
     }
     # COMMENTED THIS OUT BECAUSE I'M NOT SURE WHETHER TO INCLUDE THESE.
     # RESULTS ARE MORE SIMILAR TO HISTORICAL EDDs WHEN THIS IS COMMENTED OUT.
     # Assign NFNSU and NFNSI flags for NH3-N, "NO3-N+NO2-N", "NO3"
-    # else if (package_data[i,]$parameter %in% c("NH3-N", "NO3-N+NO2-N", "NO3")) {
-    #   utn <- package_data %>%
-    #     filter(lab_number == package_data[i,]$lab_number, parameter == "UTN") %>%
+    # else if (data[i,]$parameter %in% c("NH3-N", "NO3-N+NO2-N", "NO3")) {
+    #   utn <- data %>%
+    #     filter(lab_number == data[i,]$lab_number, parameter == "UTN") %>%
     #     select(value)
     #
-    #   tdn <- package_data %>%
-    #     filter(lab_number == package_data[i,]$lab_number, parameter == "TDN") %>%
+    #   tdn <- data %>%
+    #     filter(lab_number == data[i,]$lab_number, parameter == "TDN") %>%
     #     select(value)
     #
     #   local_mdl <- NA
     #
-    #   if (package_data[i,]$parameter == "NH3-N") {
+    #   if (data[i,]$parameter == "NH3-N") {
     #     local_mdl <- nh3_n_mdl
     #   }
-    #   else if (package_data[i,]$parameter == "NO3-N+NO2-N") {
+    #   else if (data[i,]$parameter == "NO3-N+NO2-N") {
     #     local_mdl <- no3_n_no2_n_mdl
     #   }
-    #   else if (package_data[i,]$parameter == "NO3") {
+    #   else if (data[i,]$parameter == "NO3") {
     #     local_mdl <- no3_mdl
     #   }
     #
-    #   if ( ((package_data[i,]$value - utn) %>>% (utn_mdl + local_mdl)) | ((package_data[i,]$value - tdn) %>>% (tdn_mdl + local_mdl)) )  {
-    #     package_data[i,]$flag = "NFNSU"
+    #   if ( ((data[i,]$value - utn) %>>% (utn_mdl + local_mdl)) | ((data[i,]$value - tdn) %>>% (tdn_mdl + local_mdl)) )  {
+    #     data[i,]$flag = "NFNSU"
     #   }
-    #   else if ( ((package_data[i,]$value - utn) %>>% 0) | ((package_data[i,]$value - tdn) %>>% 0) ) {
-    #     package_data[i,]$flag = "NFNSI"
+    #   else if ( ((data[i,]$value - utn) %>>% 0) | ((data[i,]$value - tdn) %>>% 0) ) {
+    #     data[i,]$flag = "NFNSI"
     #   }
     # }
-  }
+}
 
   # Assign QC flags according to Kirk's instructions in SOP
   # Case_when evaluates sequentially so flags included in order of priority
-  package_data <- package_data %>%
+  data <- data %>%
     dplyr::left_join(limits %>% dplyr::select(-c(analysis)), # join MDL and ML to data
               by = c("parameter" = "ccal_code")) %>%
     dplyr::mutate(flag = dplyr::case_when( # add flags according to priority in SOP
@@ -166,7 +140,7 @@ clean_and_flag <- function(file_path) {
       TRUE ~ flag
     ))
 
-  return(package_data)
+  return(data)
 }
 
 
@@ -174,14 +148,18 @@ clean_and_flag <- function(file_path) {
 #'
 #' @param file_path Path to .xlsx file delivered by CCAL.
 #'
-#' @return The data formatted for EQuIS
+#' @return The data formatted for input into the EQuIS system as the "Results" table. Note that Activity_ID is left blank and users must create it themselves.
 #' @export
 #'
 #' @examples
-#' add something here?!?!
+#' \dontrun{
+#' results <- getCCALData(file_path)
+#'}
 format_results <- function(file_path){
 
-  edd_results <- clean_and_flag(file_path) %>%
+  edd_results <- getCCALData(file_path)[[1]][[1]] %>% # process CCAL data with function from original package
+    handle_duplicates() %>% # remove duplicates
+    assign_flags() %>% # assign flags
     dplyr::rename("#Org_Code" = "project_code") %>%
     dplyr::mutate(Activity_ID = NA,
            Result_Type = "Actual",

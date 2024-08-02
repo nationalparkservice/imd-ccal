@@ -15,8 +15,4 @@ Useful links:
 }
 
 }
-\author{
-\strong{Maintainer}: Sarah Wright \email{sarah_wright@nps.gov} (\href{https://orcid.org/0009-0004-5060-2189}{ORCID})
-
-}
 \keyword{internal}

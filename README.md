@@ -15,7 +15,7 @@ You can install the development version of imdccal from [its GitHub repository](
 remotes::install_github("nationalparkservice/imd-ccal")
 ```
 
-## Example
+## Example: Creating Machine-Readable CCAL Data
 
 Read data from a single file of CCAL lab data and write a machine-readable version to an Excel file or set of CSV files:
 
@@ -44,5 +44,14 @@ all_files <- list.files("ccal", pattern = "*.xlsx$", full.names = TRUE)
 tidy_ccal <- getCCALData(all_files)
 lvld_18_data <- tidy_ccal$`LVLD_101118.xlsx`$data  # Get the data for a single set of lab results
 lvld_18_meta <- tidy_ccal$`LVLD_101118.xlsx`$metadata # Get the metadata for the same set of results
+```
+
+## Example: Creating the Results Table of the EQuIS EDD
+
+Read the data, create the Results table of the EDD, and work with it in R without writing the data to any files:
+
+``` r
+library(imdccal)
+results <- format_results(`LVLD_101118.xlsx`)
 ```
 

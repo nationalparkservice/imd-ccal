@@ -10,11 +10,13 @@ format_results(file_path)
 \item{file_path}{Path to .xlsx file delivered by CCAL.}
 }
 \value{
-The data formatted for EQuIS
+The data formatted for input into the EQuIS system as the "Results" table. Note that Activity_ID is left blank and users must create it themselves.
 }
 \description{
 Create the results table of the EQuIS EDD
 }
 \examples{
-add something here?!?!
+\dontrun{
+results <- getCCALData(file_path)
+}
 }

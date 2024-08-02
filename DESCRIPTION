@@ -5,6 +5,8 @@ Version: 0.1.2
 Authors@R: 
     person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-5060-2189"))
+    person("Liam", "Smith", , "lsmith@nps.gov", , role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0003-2811-1044"))
 Description: This package takes water quality data spreadsheets (.xlsx) as 
     delivered by the CCAL lab and reads them into R, including all metadata
     provided. Data can be exported to machine readable CSV or XLSX files that 
