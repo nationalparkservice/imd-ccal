@@ -16,6 +16,7 @@ LazyData: true
 Imports: 
     cli,
     dplyr,
+    fpCompare,
     janitor,
     lubridate,
     magrittr,
@@ -27,5 +28,7 @@ Imports:
     tidyr,
     tidyxl
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 URL: https://nationalparkservice.github.io/imd-ccal/
+Depends: 
+    R (>= 2.10)
