@@ -15,4 +15,13 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Sarah Wright \email{sarah_wright@nps.gov} (\href{https://orcid.org/0009-0004-5060-2189}{ORCID})
+
+Authors:
+\itemize{
+  \item Liam Smith \email{lsmith@nps.gov} (\href{https://orcid.org/0009-0003-2811-1044}{ORCID})
+}
+
+}
 \keyword{internal}

@@ -192,30 +192,67 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 
   all_data <- getCCALData(files)  # Read in data
 
+  write_data(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
+
+  return(invisible(all_data))
+}
+
+
+#' Write data to xlsx or csv file.
+#'
+#' @param all_data The data to write to file.
+#' @param format File format to export machine readable data to - either "xlsx" or "csv"
+#' @inheritParams openxlsx::write.xlsx
+#' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
+#' @param suffix Suffix to add to output file name.
+#' @param num_tables Number of tables to write to file.
+#'
+#' @export
+#'
+#' @examples
+#' #' \dontrun{
+#' write_data(all_data, format = "xlsx", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
+#' write_data(all_data, format = "csv", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
+#' }
+write_data <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
+
+  format <- match.arg(format)
+
   lapply(names(all_data), function(filename) {
     data <- all_data[[filename]]
     data_name <- stringr::str_remove(filename, "\\.xlsx")
-    data_name <- paste0(data_name, "_tidy")
+    data_name <- paste0(data_name, suffix)
     if (format == "xlsx") {
       destination <- file.path(destination_folder, paste0(data_name, ".xlsx"))
       cli::cli_progress_message("Writing {destination}")
       openxlsx::write.xlsx(data, destination, overwrite = overwrite)
-    } else if (format == "csv") {
-      lapply(names(data), function(tbl_name) {
-        destination <- file.path(destination_folder, data_name, paste0(tbl_name, ".csv"))
-        if (!dir.exists(file.path(destination_folder, data_name))) {
-          dir.create(file.path(destination_folder, data_name))
-        }
+    }
+    else if (format == "csv") {
+      if (num_tables == 1) {
+        destination <- file.path(destination_folder, paste0(data_name, ".csv"))
         if (!file.exists(destination) || overwrite) {
           cli::cli_progress_message("Writing {destination}")
-          readr::write_csv(data[[tbl_name]], destination, append = FALSE)
-        } else {
+          readr::write_csv(data, destination, append = FALSE)
+        }
+        else {
           warning(paste(destination, "already exists."))
         }
+      }
+      else {
+        lapply(names(data), function(tbl_name) {
+          destination <- file.path(destination_folder, data_name, paste0(tbl_name, ".csv"))
+          if (!dir.exists(file.path(destination_folder, data_name))) {
+            dir.create(file.path(destination_folder, data_name))
+          }
+          if (!file.exists(destination) || overwrite) {
+            cli::cli_progress_message("Writing {destination}")
+            readr::write_csv(data[[tbl_name]], destination, append = FALSE)
+          }
+          else {
+            warning(paste(destination, "already exists."))
+          }
 
-      })
+        })
     }
-  })
-
-  return(invisible(all_data))
+  }})
 }

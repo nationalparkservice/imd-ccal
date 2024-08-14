@@ -2,9 +2,9 @@
 % Please edit documentation in R/edd.R
 \name{format_results}
 \alias{format_results}
-\title{Create the results table of the EQuIS EDD}
+\title{Create the results table of the EQuIS EDD.}
 \usage{
-format_results(file_path)
+format_results(file_paths)
 }
 \arguments{
 \item{file_path}{Path to .xlsx file delivered by CCAL.}
@@ -13,10 +13,10 @@ format_results(file_path)
 The data formatted for input into the EQuIS system as the "Results" table. Note that Activity_ID is left blank and users must create it themselves.
 }
 \description{
-Create the results table of the EQuIS EDD
+Create the results table of the EQuIS EDD.
 }
 \examples{
 \dontrun{
-results <- getCCALData(file_path)
+results <- format_results(file_path)
 }
 }
