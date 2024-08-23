@@ -198,7 +198,7 @@ format_results <- function(file_paths){
                                                     flag == "KRMDL" ~ "Not Detected",
                                                     flag == "J-R" ~ "Detected And Quantified",
                                                     TRUE ~ "Detected And Quantified"),
-             Result_Type = if_else(flag == "J-R", "Estimated", "Actual"),
+             Result_Type = if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
              Reportable_Result = dplyr::if_else(flag %in% c("NFNSU", "KRMDL"), "N", "Y")) %>%
       dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
