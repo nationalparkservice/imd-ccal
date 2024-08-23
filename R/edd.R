@@ -194,18 +194,19 @@ format_results <- function(file_paths){
                        by = c("parameter" = "ccal_code")) %>%
       dplyr::rename("#Org_Code" = "project_code") %>%
       dplyr::mutate(Activity_ID = NA,
-             Result_Type = "Actual",
              Result_Detection_Condition = dplyr::case_when(flag == "NFNSU" ~ "Detected Not Quantified",
                                                     flag == "KRMDL" ~ "Not Detected",
                                                     flag == "J-R" ~ "Detected And Quantified",
                                                     TRUE ~ "Detected And Quantified"),
+             Result_Type = if_else(flag == "J-R", "Estimated", "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
              Reportable_Result = dplyr::if_else(flag %in% c("NFNSU", "KRMDL"), "N", "Y")) %>%
-      dplyr::rename("Result_Qualifier" = "flag") %>%
+      dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
+      dplyr::rename("Result_Qualifier" = "flag",
+                    "Result_Comment" = "remark.y") %>%
       dplyr::mutate(Result_Status = "Pre-Cert") %>%
-      dplyr::rename("Result_Comment" = "comment",
-             "Method_Detection_Limit" = "method_detection_limit",
-             "Lower_Quantification_Limit" = "min_level_quantification") %>%
+      dplyr::rename("Method_Detection_Limit" = "method_detection_limit",
+                    "Lower_Quantification_Limit" = "min_level_quantification") %>%
       dplyr::mutate(Upper_Quantification_Limit = NA,
              Limit_Comment = "Detection Limit Type = MDL",
              Temperature_Basis = NA,
@@ -282,10 +283,10 @@ format_results <- function(file_paths){
              Taxonomist_Accreditation_Authority_Name = NA,
              Result_File_Name = NA,
              Lab_Reported_Result = value,
-             Source_Flags = dplyr::case_when(
-               is.na(flag_symbol) ~ qa_description,
-               is.na(qa_description) ~ flag_symbol,
-               TRUE ~  paste(flag_symbol, qa_description, sep = "... ")),
+             Source_Flags = paste(comment, flag_symbol, qa_description, sep = "... "),
+             Source_Flags = str_replace_all(Source_Flags, "NA... ", ""),
+             Source_Flags = str_replace_all(Source_Flags, "... NA", ""),
+             Source_Flags = if_else(Source_Flags == "NA", NA, Source_Flags),
              Logger_Standard_Difference = NA,
              Logger_Percent_Error = NA,
              Analytical_Method_ID_Context = NA,
