@@ -31,7 +31,7 @@ handle_duplicates <- function(data) {
 #' @param data The "data" table produced by getCCALData() after duplicates have been removed with handle_duplicates().
 #'
 #' @return The input data with the addition of a new flag field.
-#' Flags included in this automated routine are NFNSU, KRMDL, J-R, and NFNSI (in that order of priority).
+#' Flags included in this automated routine are KRMDL and J-R (in that order of priority).
 #' Any other flags will need to be defined separately by the user.
 #' @export
 #'
@@ -42,131 +42,15 @@ handle_duplicates <- function(data) {
 #'   assign_flags()
 #' }
 assign_flags <- function(data) {
-  # Define constants
-  data$flag <- NA
-
-  utp_mdl <- limits %>%
-    dplyr::filter(ccal_code == "UTP") %>%
-    dplyr::select(method_detection_limit)
-
-  tdp_mdl <- limits %>%
-    dplyr::filter(ccal_code == "TDP") %>%
-    dplyr::select(method_detection_limit)
-
-  utn_mdl <- limits %>%
-    dplyr::filter(ccal_code == "UTN") %>%
-    dplyr::select(method_detection_limit)
-
-  tdn_mdl <- limits %>%
-    dplyr::filter(ccal_code == "TDN") %>%
-    dplyr::select(method_detection_limit)
-
-  po4p_mdl <- limits %>%
-    dplyr::filter(ccal_code == "PO4-P") %>%
-    dplyr::select(method_detection_limit)
-
-  nh3_n_mdl <- limits %>%
-    dplyr::filter(ccal_code == "NH3-N") %>%
-    dplyr::select(method_detection_limit)
-
-  no3_n_no2_n_mdl <- limits %>%
-    dplyr::filter(ccal_code == "NO3-N+NO2-N") %>%
-    dplyr::select(method_detection_limit)
-
-  no3_mdl <- limits %>%
-    dplyr::filter(ccal_code == "NO3") %>%
-    dplyr::select(method_detection_limit)
-
-  # Loop over every row of data to define NFNSU and NFNSI flags
-  for(i in 1:nrow(data)) {
-    # Assign NFNSU and NFNSI flags for orthophosphorus
-    if (data[i,]$parameter == "PO4-P") {
-      utp <- data %>%
-        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTP") %>%
-        dplyr::select(value)
-
-      tdp <- data %>%
-        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "TDP") %>%
-        dplyr::select(value)
-
-      if ( ((data[i,]$value - utp) %>>% (utp_mdl + po4p_mdl)) | ((data[i,]$value - tdp) %>>% (tdp_mdl + po4p_mdl)) )  { #
-        data[i,]$flag = "NFNSU"
-      }
-      else if ( ((data[i,]$value - utp) %>>% 0) | ((data[i,]$value - tdp) %>>% 0) ) {
-        data[i,]$flag = "NFNSI"
-      }
-    }
-    # Assign NFNSU and NFNSI flags for total dissolved phosphorus
-    else if (data[i,]$parameter == "TDP") {
-      utp <- data %>%
-        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTP") %>%
-        dplyr::select(value)
-
-      if ( (data[i,]$value - utp) %>>% (utp_mdl + tdp_mdl) )  { #
-        data[i,]$flag = "NFNSU"
-      }
-      else if ( (data[i,]$value - utp) %>>% 0) {
-        data[i,]$flag = "NFNSI"
-      }
-    }
-    # Assign NFNSU and NFNSI flags for total dissolved nitrogen
-    else if (data[i,]$parameter == "TDN") {
-      utn <- data %>%
-        dplyr::filter(lab_number == data[i,]$lab_number, parameter == "UTN") %>%
-        dplyr::select(value)
-
-      if ( (data[i,]$value - utn) %>>% (utn_mdl + tdn_mdl) )  { #
-        data[i,]$flag = "NFNSU"
-      }
-      else if ( (data[i,]$value - utn) %>>% 0) {
-        data[i,]$flag = "NFNSI"
-      }
-    }
-    # COMMENTED THIS OUT BECAUSE I'M NOT SURE WHETHER TO INCLUDE THESE.
-    # RESULTS ARE MORE SIMILAR TO HISTORICAL EDDs WHEN THIS IS COMMENTED OUT.
-    # Assign NFNSU and NFNSI flags for NH3-N, "NO3-N+NO2-N", "NO3"
-    # else if (data[i,]$parameter %in% c("NH3-N", "NO3-N+NO2-N", "NO3")) {
-    #   utn <- data %>%
-    #     filter(lab_number == data[i,]$lab_number, parameter == "UTN") %>%
-    #     select(value)
-    #
-    #   tdn <- data %>%
-    #     filter(lab_number == data[i,]$lab_number, parameter == "TDN") %>%
-    #     select(value)
-    #
-    #   local_mdl <- NA
-    #
-    #   if (data[i,]$parameter == "NH3-N") {
-    #     local_mdl <- nh3_n_mdl
-    #   }
-    #   else if (data[i,]$parameter == "NO3-N+NO2-N") {
-    #     local_mdl <- no3_n_no2_n_mdl
-    #   }
-    #   else if (data[i,]$parameter == "NO3") {
-    #     local_mdl <- no3_mdl
-    #   }
-    #
-    #   if ( ((data[i,]$value - utn) %>>% (utn_mdl + local_mdl)) | ((data[i,]$value - tdn) %>>% (tdn_mdl + local_mdl)) )  {
-    #     data[i,]$flag = "NFNSU"
-    #   }
-    #   else if ( ((data[i,]$value - utn) %>>% 0) | ((data[i,]$value - tdn) %>>% 0) ) {
-    #     data[i,]$flag = "NFNSI"
-    #   }
-    # }
-  }
-
-  # Assign QC flags according to Kirk's instructions in SOP
-  # Case_when evaluates sequentially so flags included in order of priority
   data <- data %>%
     dplyr::left_join(limits %>% dplyr::select(ccal_code, method_detection_limit, min_level_quantification), # join MDL and ML to data
               by = c("parameter" = "ccal_code")) %>%
     dplyr::mutate(flag = dplyr::case_when( # add flags according to priority in SOP
-      flag == "NFNSU" ~ "NFNSU",
       value %<=% method_detection_limit ~ "KRMDL",
       value %<=% min_level_quantification ~ "J-R",
-      TRUE ~ flag
+      TRUE ~ NA
     )) %>%
-    select(-method_detection_limit, -min_level_quantification) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
+    dplyr::select(-method_detection_limit, -min_level_quantification) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
 
   return(data)
 }
@@ -194,13 +78,12 @@ format_results <- function(file_paths){
                        by = c("parameter" = "ccal_code")) %>%
       dplyr::rename("#Org_Code" = "project_code") %>%
       dplyr::mutate(Activity_ID = NA,
-             Result_Detection_Condition = dplyr::case_when(flag == "NFNSU" ~ "Detected Not Quantified",
-                                                    flag == "KRMDL" ~ "Not Detected",
-                                                    flag == "J-R" ~ "Detected And Quantified",
-                                                    TRUE ~ "Detected And Quantified"),
+             Result_Detection_Condition = dplyr::case_when(flag == "KRMDL" ~ "Not Detected",
+                                                           flag == "J-R" ~ "Detected And Quantified",
+                                                           TRUE ~ "Detected And Quantified"),
              Result_Type = if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
-             Reportable_Result = dplyr::if_else(flag %in% c("NFNSU", "KRMDL"), "N", "Y")) %>%
+             Reportable_Result = dplyr::if_else(flag == "KRMDL", "N", "Y")) %>%
       dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
       dplyr::rename("Result_Qualifier" = "flag",
                     "Result_Comment" = "remark.y") %>%
@@ -283,10 +166,10 @@ format_results <- function(file_paths){
              Taxonomist_Accreditation_Authority_Name = NA,
              Result_File_Name = NA,
              Lab_Reported_Result = value,
-             Source_Flags = paste(comment, flag_symbol, qa_description, sep = "... "),
-             Source_Flags = str_replace_all(Source_Flags, "NA... ", ""),
-             Source_Flags = str_replace_all(Source_Flags, "... NA", ""),
-             Source_Flags = if_else(Source_Flags == "NA", NA, Source_Flags),
+             Source_Flags = comment, #paste(comment, flag_symbol, qa_description, sep = "... "),
+             # Source_Flags = str_replace_all(Source_Flags, "NA... ", ""),
+             # Source_Flags = str_replace_all(Source_Flags, "... NA", ""),
+             # Source_Flags = if_else(Source_Flags == "NA", NA, Source_Flags),
              Logger_Standard_Difference = NA,
              Logger_Percent_Error = NA,
              Analytical_Method_ID_Context = NA,

@@ -11,7 +11,7 @@ assign_flags(data)
 }
 \value{
 The input data with the addition of a new flag field.
-Flags included in this automated routine are NFNSU, KRMDL, J-R, and NFNSI (in that order of priority).
+Flags included in this automated routine are KRMDL and J-R (in that order of priority).
 Any other flags will need to be defined separately by the user.
 }
 \description{
