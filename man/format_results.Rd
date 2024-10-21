@@ -10,7 +10,9 @@ format_results(file_paths)
 \item{file_path}{Path to .xlsx file delivered by CCAL.}
 }
 \value{
-The data formatted for input into the EQuIS system as the "Results" table. Note that Activity_ID is left blank and users must create it themselves.
+The data formatted for input into the EQuIS system as the "Results" table.
+Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
+For example, users must define Activity_ID, assign any additional flags, and modify Result_Status depending on the outcome of their quality control process.
 }
 \description{
 Create the results table of the EQuIS EDD.

@@ -21,17 +21,17 @@ handle_duplicates <- function(data) {
     dplyr::group_by(dplyr::across(-c(qa_description, qa_within_precision_limits))) %>%
     dplyr::summarise(qa_description = paste(qa_description, collapse = "... ")) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(qa_description = dplyr::if_else(qa_description == "NA", NA, qa_description)) # fix NA handling issue
+    dplyr::mutate(qa_description = dplyr::if_else(qa_description == "NA", NA, qa_description)) # fix NA issue
 
   return(data)
 }
 
-#' Assign quality control flags.
+#' Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
 #'
 #' @param data The "data" table produced by getCCALData() after duplicates have been removed with handle_duplicates().
 #'
 #' @return The input data with the addition of a new flag field.
-#' Flags included in this automated routine are KRMDL and J-R (in that order of priority).
+#' The only flag included in this routine is the J-R flag.
 #' Any other flags will need to be defined separately by the user.
 #' @export
 #'
@@ -39,28 +39,31 @@ handle_duplicates <- function(data) {
 #' \dontrun{
 #' getCCALData(file_path)[[1]][[1]] %>%
 #'   handle_duplicates() %>%
-#'   assign_flags()
+#'   assign_detection_flags()
 #' }
-assign_flags <- function(data) {
+assign_detection_flags <- function(data) {
   data <- data %>%
-    dplyr::left_join(limits %>% dplyr::select(ccal_code, method_detection_limit, min_level_quantification), # join MDL and ML to data
-              by = c("parameter" = "ccal_code")) %>%
-    dplyr::mutate(flag = dplyr::case_when( # add flags according to priority in SOP
-      value %<=% method_detection_limit ~ "KRMDL",
+    dplyr::left_join(limits %>% dplyr::select(analyte_code, method_detection_limit, min_level_quantification, StartDate, EndDate), # join MDL and ML to data
+                     by = dplyr::join_by(parameter == analyte_code,
+                                         date >= StartDate,
+                                         date <= EndDate)) %>%
+    dplyr::mutate(flag = dplyr::case_when(
+      value %<=% method_detection_limit ~ NA,
       value %<=% min_level_quantification ~ "J-R",
       TRUE ~ NA
     )) %>%
-    dplyr::select(-method_detection_limit, -min_level_quantification) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
+    dplyr::select(-c(method_detection_limit, min_level_quantification, StartDate, EndDate)) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
 
   return(data)
 }
-
 
 #' Create the results table of the EQuIS EDD.
 #'
 #' @param file_path Path to .xlsx file delivered by CCAL.
 #'
-#' @return The data formatted for input into the EQuIS system as the "Results" table. Note that Activity_ID is left blank and users must create it themselves.
+#' @return The data formatted for input into the EQuIS system as the "Results" table.
+#' Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
+#' For example, users must define Activity_ID, assign any additional flags, and modify Result_Status depending on the outcome of their quality control process.
 #' @export
 #'
 #' @examples
@@ -73,17 +76,18 @@ format_results <- function(file_paths){
     lapply(function(x) {
     x[[1]] %>% # process CCAL data with function from original package
       handle_duplicates() %>% # remove duplicates
-      assign_flags() %>% # assign flags
-      dplyr::left_join(limits %>% dplyr::select(-c(analysis)), # join data about detection limits
-                       by = c("parameter" = "ccal_code")) %>%
+      assign_detection_flags() %>% # assign J-R flag
+      dplyr::left_join(limits %>% dplyr::select(-analysis), # join data about detection limits
+                         by = dplyr::join_by(parameter == analyte_code,
+                                             date >= StartDate,
+                                             date <= EndDate)) %>%
       dplyr::rename("#Org_Code" = "project_code") %>%
       dplyr::mutate(Activity_ID = NA,
-             Result_Detection_Condition = dplyr::case_when(flag == "KRMDL" ~ "Not Detected",
-                                                           flag == "J-R" ~ "Detected And Quantified",
-                                                           TRUE ~ "Detected And Quantified"),
+             Result_Detection_Condition = dplyr::if_else(value %<=% method_detection_limit,
+                                                         "Not Detected", "Detected And Quantified"),
              Result_Type = if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
-             Reportable_Result = dplyr::if_else(flag == "KRMDL", "N", "Y")) %>%
+             Reportable_Result = NA) %>%
       dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
       dplyr::rename("Result_Qualifier" = "flag",
                     "Result_Comment" = "remark.y") %>%
@@ -206,8 +210,6 @@ format_results <- function(file_paths){
              Logger_Standard_Difference, Logger_Percent_Error, Analytical_Method_ID_Context,
              Predicted_Result)
     })
-
-  # add in names() basename() thing
 
   return(edd_results)
 }
