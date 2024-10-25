@@ -85,7 +85,7 @@ format_results <- function(file_paths){
       dplyr::mutate(Activity_ID = NA,
              Result_Detection_Condition = dplyr::if_else(value %<=% method_detection_limit,
                                                          "Not Detected", "Detected And Quantified"),
-             Result_Type = if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
+             Result_Type = dplyr::if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
              Reportable_Result = NA) %>%
       dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
