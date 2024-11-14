@@ -14,7 +14,7 @@ the EQuIS EDD format.
 ## Installation
 
 You can install the development version of imdccal from [its GitHub
-repository](https://github.com/nationalparkservice/nccn-climate) with:
+repository](https://github.com/nationalparkservice/imd-ccal) with:
 
 ``` r
 # install.packages("remotes")
@@ -28,9 +28,8 @@ CCAL deliverable that is downloaded with the package. The story behind
 the data is that it is 2099 and the NPS now has an Outer Space Network
 with monitoring locations on the Moon, Mars, Mercury, and Saturn. Users
 can find the file path to the example data by running the following line
-of code. We recommend using this document to explore the various
-functions in the package, as all code in this document should work for
-users after installing the package.
+of code. Since the example data is installed with the package, you can
+run any of the code in this ReadMe on your own computer.
 
 ``` r
 system.file("extdata", "SPAC_080199.xlsx", package = "imdccal")
@@ -48,7 +47,7 @@ library(imdccal)
 # Create tidied CCAL data from demo data stored in the imdccal package
 tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmp0SnDGV/temp_libpath4…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
 data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
 meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata # Get the metadata for the same set of results
 ```
@@ -80,10 +79,10 @@ machineReadableCCAL(system.file("extdata", "SPAC_080199.xlsx", package = "imdcca
                     format = "csv", destination_folder = "ccal_tidy")  # Write tidied data to a folder of CSV files
 ```
 
-All of the aforementioned functions also work when supplied with a
-vector of file paths to multiple CCAL deliverables. Here is an example
-of reading data from *multiple* files of CCAL lab data and writing the
-machine-readable version to an Excel files or sets of CSV files.
+All of these functions also work when supplied with a vector of file
+paths to multiple CCAL deliverables. Here is an example of reading data
+from *multiple* files of CCAL lab data and writing the machine-readable
+version to an Excel files or sets of CSV files.
 
 ``` r
 # Get file paths
@@ -114,8 +113,8 @@ table for the EDD.
 
 **Limitations:**
 
-- Users still need to create Activities table for every deliverable, and
-  the Projects and Locations tables when there are changes to make.
+- Users still need to create Activities table for every deliverable and
+  the Projects and Locations tables when they require edits.
 - Within the Results table, users still need to define Activity_ID,
   modify Result_Status (set to Pre-Cert since additional QC is needed),
   add flags, and conduct the rest of their own QC processes
@@ -128,7 +127,7 @@ data to any files:
 # Create results table from demo data stored in the imdccal package
 results_incomplete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmp0SnDGV/temp_libpath4…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
 ```
 
 If you inspect the table created above, you will notice that there are
@@ -167,7 +166,7 @@ below.
 results_complete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
                                    limits = limits)
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmp0SnDGV/temp_libpath4…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
 ```
 
 Users may also provide their own version of the qualifiers table, which
@@ -201,7 +200,7 @@ step process of creating the results table R object and writing it to
 file, users may use the `write_results()` function to create and write
 the results table to file in one step. Here is an example of reading
 data from a single file of CCAL lab data and writing the results table
-to an Excel file or set of CSV files.
+to an Excel or CSV file.
 
 ``` r
 # Write results table to xlsx from demo data stored in imdccal package
@@ -222,7 +221,7 @@ write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdc
 Finally, as before, all of these functions work when supplied with a
 vector of file paths to multiple CCAL deliverables. Here is an example
 of reading data from *multiple* files of CCAL lab data and writing the
-results tables to an Excel files or sets of CSV files.
+results tables to Excel or CSV files.
 
 ``` r
 # Get file paths
@@ -233,12 +232,12 @@ all_files <- list.files(system.file("extdata", package = "imdccal"),
 write_results(files = all_files, 
               limits = limits,
               destination_folder = "ccal_tidy",
-              overwrite = TRUE)  # Write one file of tidied data per input file
+              overwrite = TRUE)
 
 # Write to csv
 write_results(files = all_files, 
               limits = limits,
               format = "csv", 
               destination_folder = "ccal_tidy",
-              overwrite = TRUE)  # Write one folder of tidied CSV data per input file
+              overwrite = TRUE)
 ```

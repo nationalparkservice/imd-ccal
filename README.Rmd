@@ -22,7 +22,7 @@ The goal of imdccal is to extract data from [CCAL](https://ccal.oregonstate.edu/
 
 ## Installation
 
-You can install the development version of imdccal from [its GitHub repository](https://github.com/nationalparkservice/nccn-climate) with:
+You can install the development version of imdccal from [its GitHub repository](https://github.com/nationalparkservice/imd-ccal) with:
 
 ``` r
 # install.packages("remotes")
@@ -34,7 +34,7 @@ remotes::install_github("nationalparkservice/imd-ccal")
 To demonstrate the functionality of imdccal, we created a fictitious CCAL deliverable that is downloaded with the package.
 The story behind the data is that it is 2099 and the NPS now has an Outer Space Network with monitoring locations on the Moon, Mars, Mercury, and Saturn.
 Users can find the file path to the example data by running the following line of code.
-We recommend using this document to explore the various functions in the package, as all code in this document should work for users after installing the package.
+Since the example data is installed with the package, you can run any of the code in this ReadMe on your own computer.
 
 ```{r, eval = FALSE}
 system.file("extdata", "SPAC_080199.xlsx", package = "imdccal")
@@ -78,7 +78,7 @@ machineReadableCCAL(system.file("extdata", "SPAC_080199.xlsx", package = "imdcca
                     format = "csv", destination_folder = "ccal_tidy")  # Write tidied data to a folder of CSV files
 ```
 
-All of the aforementioned functions also work when supplied with a vector of file paths to multiple CCAL deliverables.
+All of these functions also work when supplied with a vector of file paths to multiple CCAL deliverables.
 Here is an example of reading data from *multiple* files of CCAL lab data and writing the machine-readable version to an Excel files or sets of CSV files.
 
 ```{r, eval=FALSE}
@@ -106,7 +106,7 @@ Specifically, the `format_results()` function begins to format the data into the
 
 **Limitations:**
 
-- Users still need to create Activities table for every deliverable, and the Projects and Locations tables when there are changes to make.
+- Users still need to create Activities table for every deliverable and the Projects and Locations tables when they require edits.
 - Within the Results table, users still need to define Activity_ID, modify Result_Status (set to Pre-Cert since additional QC is needed), add flags, and conduct the rest of their own QC processes
 
 Here we demonstrate the useage of this function.
@@ -164,7 +164,7 @@ write_data(all_data = results_complete,
 ```
 
 Also in the same manner as the machine readable data, instead of a two step process of creating the results table R object and writing it to file, users may use the `write_results()` function to create and write the results table to file in one step.
-Here is an example of reading data from a single file of CCAL lab data and writing the results table to an Excel file or set of CSV files.
+Here is an example of reading data from a single file of CCAL lab data and writing the results table to an Excel or CSV file.
 
 ```{r, eval=FALSE}
 # Write results table to xlsx from demo data stored in imdccal package
@@ -183,7 +183,7 @@ write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdc
 ```
 
 Finally, as before, all of these functions work when supplied with a vector of file paths to multiple CCAL deliverables.
-Here is an example of reading data from *multiple* files of CCAL lab data and writing the results tables to an Excel files or sets of CSV files.
+Here is an example of reading data from *multiple* files of CCAL lab data and writing the results tables to Excel or CSV files.
 
 ```{r, eval=FALSE}
 # Get file paths
@@ -194,12 +194,12 @@ all_files <- list.files(system.file("extdata", package = "imdccal"),
 write_results(files = all_files, 
               limits = limits,
               destination_folder = "ccal_tidy",
-              overwrite = TRUE)  # Write one file of tidied data per input file
+              overwrite = TRUE)
 
 # Write to csv
 write_results(files = all_files, 
               limits = limits,
               format = "csv", 
               destination_folder = "ccal_tidy",
-              overwrite = TRUE)  # Write one folder of tidied CSV data per input file
+              overwrite = TRUE)
 ```
