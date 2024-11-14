@@ -16,8 +16,6 @@ The data after lab QC duplicates have been removed and any duplicate rows result
 Remove lab duplicates and other duplicate rows.
 }
 \examples{
-\dontrun{
-getCCALData(file_path)[[1]][[1]] \%>\%
+tidy_ccal_no_dups <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] \%>\%
   handle_duplicates()
-}
 }

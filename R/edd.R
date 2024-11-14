@@ -6,10 +6,8 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' getCCALData(file_path)[[1]][[1]] %>%
+#' tidy_ccal_no_dups <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] %>%
 #'   handle_duplicates()
-#' }
 handle_duplicates <- function(data) {
 
   # Drop lab duplicates
@@ -29,6 +27,7 @@ handle_duplicates <- function(data) {
 #' Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
 #'
 #' @param data The "data" table produced by getCCALData() after duplicates have been removed with handle_duplicates().
+#' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
 #'
 #' @return The input data with the addition of a new flag field.
 #' The only flag included in this routine is the J-R flag.
@@ -36,30 +35,30 @@ handle_duplicates <- function(data) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' getCCALData(file_path)[[1]][[1]] %>%
+#' tidy_ccal_flagged <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] %>%
 #'   handle_duplicates() %>%
 #'   assign_detection_flags()
-#' }
-assign_detection_flags <- function(data) {
+assign_detection_flags <- function(data, limits = imdccal::limits) {
   data <- data %>%
-    dplyr::left_join(limits %>% dplyr::select(analyte_code, method_detection_limit, min_level_quantification, StartDate, EndDate), # join MDL and ML to data
+    dplyr::left_join(limits %>% dplyr::select(analyte_code, Method_Detection_Limit, Lower_Quantification_Limit, StartDate, EndDate), # join MDL and ML to data
                      by = dplyr::join_by(parameter == analyte_code,
                                          date >= StartDate,
                                          date <= EndDate)) %>%
     dplyr::mutate(flag = dplyr::case_when(
-      value %<=% method_detection_limit ~ NA,
-      value %<=% min_level_quantification ~ "J-R",
+      value %<=% Method_Detection_Limit ~ NA,
+      value %<=% Lower_Quantification_Limit ~ "J-R",
       TRUE ~ NA
     )) %>%
-    dplyr::select(-c(method_detection_limit, min_level_quantification, StartDate, EndDate)) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
+    dplyr::select(-c(Method_Detection_Limit, Lower_Quantification_Limit, StartDate, EndDate)) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
 
   return(data)
 }
 
 #' Create the results table of the EQuIS EDD.
 #'
-#' @param file_path Path to .xlsx file delivered by CCAL.
+#' @param file_paths Path to .xlsx file delivered by CCAL.
+#' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
+#' @param qualifiers Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.
 #'
 #' @return The data formatted for input into the EQuIS system as the "Results" table.
 #' Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
@@ -67,23 +66,27 @@ assign_detection_flags <- function(data) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' results <- format_results(file_path)
-#'}
-format_results <- function(file_paths){
+#' # Edit limits table to work with example data
+#' limits <- imdccal::limits |>
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#'
+#' # Create results table
+#' results <- format_results(file_paths = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+#'                           limits = limits)
+format_results <- function(file_paths, limits = imdccal::limits, qualifiers = imdccal::qualifiers){
 
   edd_results <- getCCALData(file_paths) %>%
     lapply(function(x) {
     x[[1]] %>% # process CCAL data with function from original package
       handle_duplicates() %>% # remove duplicates
-      assign_detection_flags() %>% # assign J-R flag
+      assign_detection_flags(limits) %>% # assign J-R flag
       dplyr::left_join(limits %>% dplyr::select(-analysis), # join data about detection limits
                          by = dplyr::join_by(parameter == analyte_code,
                                              date >= StartDate,
                                              date <= EndDate)) %>%
       dplyr::rename("#Org_Code" = "project_code") %>%
       dplyr::mutate(Activity_ID = NA,
-             Result_Detection_Condition = dplyr::if_else(value %<=% method_detection_limit,
+             Result_Detection_Condition = dplyr::if_else(value %<=% Method_Detection_Limit,
                                                          "Not Detected", "Detected And Quantified"),
              Result_Type = dplyr::if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
@@ -92,8 +95,6 @@ format_results <- function(file_paths){
       dplyr::rename("Result_Qualifier" = "flag",
                     "Result_Comment" = "remark.y") %>%
       dplyr::mutate(Result_Status = "Pre-Cert") %>%
-      dplyr::rename("Method_Detection_Limit" = "method_detection_limit",
-                    "Lower_Quantification_Limit" = "min_level_quantification") %>%
       dplyr::mutate(Upper_Quantification_Limit = NA,
              Limit_Comment = "Detection Limit Type = MDL",
              Temperature_Basis = NA,
@@ -217,6 +218,8 @@ format_results <- function(file_paths){
 #' Write the results table of the EQuIS EDD.
 #'
 #' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
+#' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
+#' @param qualifiers Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.
 #' @inheritParams openxlsx::write.xlsx
 #' @param format File format to export machine readable data to - either "xlsx" or "csv"
 #' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
@@ -226,26 +229,34 @@ format_results <- function(file_paths){
 #'
 #' @examples
 #' \dontrun{
-#' ccal_folder <- "ccal_results"
-#' dest_folder <- "ccal_results/edd"
-#' file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' write_results(file_list, format = "xlsx", destination_folder = dest_folder)
-#' write_results(file_list, format = "csv", destination_folder = dest_folder)
+#' # Edit limits table to work with example data
+#' limits <- imdccal::limits |>
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#'
+#' # Get file paths
+#' all_files <- list.files(system.file("extdata", package = "imdccal"),
+#'                         pattern = "*.xlsx$", full.names = TRUE)
+#'
+#' # Write to xlsx
+#' write_results(files = all_files,
+#'               limits = limits,
+#'               destination_folder = "ccal_tidy",
+#'               overwrite = TRUE)  # Write one file of tidied data per input file
+#'
+#' # Write to csv
+#' write_results(files = all_files,
+#'               limits = limits,
+#'               format = "csv",
+#'               destination_folder = "ccal_tidy",
+#'               overwrite = TRUE)  # Write one folder of tidied CSV data per input file
 #' }
-write_results <- function(files, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
+write_results <- function(files, limits = imdccal::limits, qualifiers = imdccal::qualifiers, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- format_results(files)  # Read in data
+  all_data <- format_results(files, limits, qualifiers)  # Read in data
 
   write_data(all_data, format, destination_folder, overwrite, suffix = "_edd_results", num_tables = 1)
 
   return(invisible(all_data))
 }
-
-
-
-
-
-
-

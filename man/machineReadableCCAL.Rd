@@ -28,10 +28,15 @@ Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx
 }
 \examples{
 \dontrun{
-ccal_folder <- "ccal_results"
-dest_folder <- "ccal_results/tidied"
-file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-machineReadableCCAL(file_list, format = "xlsx", destination_folder = dest_folder)
-machineReadableCCAL(file_list, format = "csv", destination_folder = dest_folder)
+# Get file paths
+all_files <- list.files(system.file("extdata", package = "imdccal"),
+                       pattern = "*.xlsx$", full.names = TRUE)
+
+# Write to xlsx
+machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+
+# Write to csv
+machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+
 }
 }

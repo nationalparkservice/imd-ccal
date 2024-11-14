@@ -1,4 +1,4 @@
-#' Read CCAL Data
+#' Read CCAL Data and convert to machine-readable format.
 #'
 #' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
 #'
@@ -6,11 +6,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' my_folder <- "ccal_results"
-#' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#'}
+#' tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 getCCALData <- function(files) {
   data <- purrr::map(files, function(file) {
 
@@ -180,11 +176,16 @@ getCCALData <- function(files) {
 #'
 #' @examples
 #' \dontrun{
-#' ccal_folder <- "ccal_results"
-#' dest_folder <- "ccal_results/tidied"
-#' file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' machineReadableCCAL(file_list, format = "xlsx", destination_folder = dest_folder)
-#' machineReadableCCAL(file_list, format = "csv", destination_folder = dest_folder)
+#' # Get file paths
+#' all_files <- list.files(system.file("extdata", package = "imdccal"),
+#'                        pattern = "*.xlsx$", full.names = TRUE)
+#'
+#' # Write to xlsx
+#' machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+#'
+#' # Write to csv
+#' machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+#'
 #' }
 machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
   format <- match.arg(format)
@@ -196,7 +197,6 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 
   return(invisible(all_data))
 }
-
 
 #' Write data to xlsx or csv file.
 #'
@@ -210,9 +210,17 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 #' @export
 #'
 #' @examples
-#' #' \dontrun{
-#' write_data(all_data, format = "xlsx", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
-#' write_data(all_data, format = "csv", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
+#' \dontrun{
+#' # Create tidied CCAL data from demo data stored in the imdccal package
+#' tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+#'
+#' # Write data stored in environment to file
+#' write_data(all_data = tidy_ccal,
+#'           format = "xlsx", # alternatively, "csv"
+#'           destination_folder = "ccal_tidy", # must already exist
+#'           overwrite = TRUE,
+#'           suffix = "_tidy",
+#'           num_tables = 4)
 #' }
 write_data <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
 

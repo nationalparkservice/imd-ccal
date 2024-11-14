@@ -4,10 +4,18 @@
 \alias{format_results}
 \title{Create the results table of the EQuIS EDD.}
 \usage{
-format_results(file_paths)
+format_results(
+  file_paths,
+  limits = imdccal::limits,
+  qualifiers = imdccal::qualifiers
+)
 }
 \arguments{
-\item{file_path}{Path to .xlsx file delivered by CCAL.}
+\item{file_paths}{Path to .xlsx file delivered by CCAL.}
+
+\item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
+
+\item{qualifiers}{Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.}
 }
 \value{
 The data formatted for input into the EQuIS system as the "Results" table.
@@ -18,7 +26,11 @@ For example, users must define Activity_ID, assign any additional flags, and mod
 Create the results table of the EQuIS EDD.
 }
 \examples{
-\dontrun{
-results <- format_results(file_path)
-}
+# Edit limits table to work with example data
+limits <- imdccal::limits |>
+  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+
+# Create results table
+results <- format_results(file_paths = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+                          limits = limits)
 }

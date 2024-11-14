@@ -6,6 +6,8 @@
 \usage{
 write_results(
   files,
+  limits = imdccal::limits,
+  qualifiers = imdccal::qualifiers,
   format = c("xlsx", "csv"),
   destination_folder = "./",
   overwrite = FALSE
@@ -13,6 +15,10 @@ write_results(
 }
 \arguments{
 \item{files}{Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.}
+
+\item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
+
+\item{qualifiers}{Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.}
 
 \item{format}{File format to export machine readable data to - either "xlsx" or "csv"}
 
@@ -28,10 +34,25 @@ Write the results table of the EQuIS EDD.
 }
 \examples{
 \dontrun{
-ccal_folder <- "ccal_results"
-dest_folder <- "ccal_results/edd"
-file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-write_results(file_list, format = "xlsx", destination_folder = dest_folder)
-write_results(file_list, format = "csv", destination_folder = dest_folder)
+# Edit limits table to work with example data
+limits <- imdccal::limits |>
+  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+
+# Get file paths
+all_files <- list.files(system.file("extdata", package = "imdccal"),
+                        pattern = "*.xlsx$", full.names = TRUE)
+
+# Write to xlsx
+write_results(files = all_files,
+              limits = limits,
+              destination_folder = "ccal_tidy",
+              overwrite = TRUE)  # Write one file of tidied data per input file
+
+# Write to csv
+write_results(files = all_files,
+              limits = limits,
+              format = "csv",
+              destination_folder = "ccal_tidy",
+              overwrite = TRUE)  # Write one folder of tidied CSV data per input file
 }
 }

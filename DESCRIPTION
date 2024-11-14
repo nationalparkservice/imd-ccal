@@ -11,7 +11,8 @@ Description: This package takes water quality data spreadsheets (.xlsx) as
     delivered by the CCAL lab and reads them into R, including all metadata
     provided. Data can be exported to machine readable CSV or XLSX files that 
     can easily be analyzed, imported into database tables, or added to an NPS 
-    data package for publication.
+    data package for publication. Also includes functionality to format data 
+    into the Results table for inclusion in an EQuIS EDD.
 License: CC0
 Encoding: UTF-8
 LazyData: true

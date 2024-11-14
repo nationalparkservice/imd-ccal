@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_write.R
 \name{getCCALData}
 \alias{getCCALData}
-\title{Read CCAL Data}
+\title{Read CCAL Data and convert to machine-readable format.}
 \usage{
 getCCALData(files)
 }
@@ -13,12 +13,8 @@ getCCALData(files)
 A nested list. Each list item corresponds to one input file and contains data frames for data and metadata.
 }
 \description{
-Read CCAL Data
+Read CCAL Data and convert to machine-readable format.
 }
 \examples{
-\dontrun{
-my_folder <- "ccal_results"
-file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-all_ccal_data <- getCCALData(file_list)
-}
+tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 }

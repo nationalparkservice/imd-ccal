@@ -30,8 +30,16 @@ write_data(
 Write data to xlsx or csv file.
 }
 \examples{
-#' \dontrun{
-write_data(all_data, format = "xlsx", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
-write_data(all_data, format = "csv", destination_folder = dest_folder, overwrite = TRUE, suffix = "_tidy", num_tables = 4)
+\dontrun{
+# Create tidied CCAL data from demo data stored in the imdccal package
+tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+
+# Write data stored in environment to file
+write_data(all_data = tidy_ccal,
+          format = "xlsx", # alternatively, "csv"
+          destination_folder = "ccal_tidy", # must already exist
+          overwrite = TRUE,
+          suffix = "_tidy",
+          num_tables = 4)
 }
 }
