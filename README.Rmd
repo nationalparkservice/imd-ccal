@@ -31,13 +31,14 @@ remotes::install_github("nationalparkservice/imd-ccal")
 
 ## Example Data
 
-To demonstrate the functionality of imdccal, we created a fictitious CCAL deliverable that is downloaded with the package.
+To demonstrate the functionality of imdccal, we created two fictitious CCAL deliverables that are downloaded with the package.
 The story behind the data is that it is 2099 and the NPS now has an Outer Space Network with monitoring locations on the Moon, Mars, Mercury, and Saturn.
-Users can find the file path to the example data by running the following line of code.
+Users can find the file paths to the example data by running the following code chunk.
 Since the example data is installed with the package, you can run any of the code in this ReadMe on your own computer.
 
 ```{r, eval = FALSE}
 system.file("extdata", "SPAC_080199.xlsx", package = "imdccal")
+system.file("extdata", "SPAC_081599.xlsx", package = "imdccal")
 ```
 
 ## Example: Creating Machine-Readable CCAL Data 
@@ -91,6 +92,13 @@ machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one fi
 
 # Write to csv
 machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+```
+
+By default, these functions create separate tables and files for each CCAL deliverable supplied as input.
+To concatenate the results together, set the concat argument in `getCCALData()` or `machineReadableCCAL()` to TRUE.
+
+```{r, eval = FALSE}
+machineReadableCCAL(all_files, destination_folder = "ccal_tidy", concat = TRUE)
 ```
 
 ## Example: Creating the Results Table of the EQuIS EDD
@@ -182,7 +190,7 @@ write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdc
               overwrite = TRUE)
 ```
 
-Finally, as before, all of these functions work when supplied with a vector of file paths to multiple CCAL deliverables.
+As before, all of these functions work when supplied with a vector of file paths to multiple CCAL deliverables.
 Here is an example of reading data from *multiple* files of CCAL lab data and writing the results tables to Excel or CSV files.
 
 ```{r, eval=FALSE}
@@ -202,4 +210,15 @@ write_results(files = all_files,
               format = "csv", 
               destination_folder = "ccal_tidy",
               overwrite = TRUE)
+```
+
+By default, these functions create separate tables and files for each CCAL deliverable supplied as input.
+To concatenate the results together, set the concat argument in `format_results()` or `write_results()` to TRUE.
+
+```{r, eval = FALSE}
+write_results(files = all_files, 
+              limits = limits,
+              destination_folder = "ccal_tidy",
+              overwrite = TRUE,
+              concat = TRUE)
 ```

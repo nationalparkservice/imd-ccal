@@ -1,13 +1,16 @@
 #' Read CCAL Data and convert to machine-readable format.
 #'
 #' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
+#' @param concat If concat is set to TRUE, the output contains one table for data, one for metadata, one for samples, and one for questionable, rather than one of each table for every input file.
+#' By default, concat is set to FALSE, so the output contains separate tables for each file.
+#' If only one file path is supplied to the files argument, this parameter does not affect the output.
 #'
 #' @return A nested list. Each list item corresponds to one input file and contains data frames for data and metadata.
 #' @export
 #'
 #' @examples
 #' tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
-getCCALData <- function(files) {
+getCCALData <- function(files, concat = FALSE) {
   data <- purrr::map(files, function(file) {
 
     cli::cli_progress_message("Reading data from {file}...")
@@ -159,14 +162,34 @@ getCCALData <- function(files) {
 
   names(data) <- basename(files)
 
-  return(data)
+  if(concat) {
+    data_concat <- purrr::map(seq_along(data[[1]]), function(i) {
+      dplyr::bind_rows(purrr::map(data, ~ .x[[i]]))
+    })
+
+    names(data_concat) = c("data", "metadata", "samples", "questionable")
+
+    data_concat <- list(data_concat)
+
+    names(data_concat) <- paste(names(data), collapse = "_") %>%
+      stringr::str_remove_all(".xlsx") %>%
+      paste0(".xlsx")
+
+    return(data_concat)
+  }
+  else {
+    return(data)
+  }
 }
 
 #' Wrangle CCAL data into a machine-readable format
 #'
 #' Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx file or csv files in a folder.
 #'
-#' @inheritParams getCCALData
+#' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
+#' @param concat If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
+#' By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
+#' If only one file path is supplied to the files argument, this parameter does not affect the output.
 #' @inheritParams openxlsx::write.xlsx
 #' @param format File format to export machine readable data to - either "xlsx" or "csv"
 #' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
@@ -187,11 +210,12 @@ getCCALData <- function(files) {
 #' machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
 #'
 #' }
-machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
+machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
+                                overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- getCCALData(files)  # Read in data
+  all_data <- getCCALData(files, concat)  # Read in data
 
   write_data(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
 

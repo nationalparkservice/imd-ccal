@@ -10,7 +10,8 @@ write_results(
   qualifiers = imdccal::qualifiers,
   format = c("xlsx", "csv"),
   destination_folder = "./",
-  overwrite = FALSE
+  overwrite = FALSE,
+  concat = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,10 @@ write_results(
 \item{destination_folder}{Folder to save the data in. Defaults to current working directory. Folder must already exist.}
 
 \item{overwrite}{Overwrite existing file (Defaults to \code{TRUE} as with \code{write.table})}
+
+\item{concat}{If concat is set to TRUE, the function creates one file rather than one for every CCAL deliverable.
+By default, concat is set to FALSE, so the output contains separate files for each CCAL deliverable.
+If only one file path is supplied to the files argument, this parameter does not affect the output.}
 }
 \value{
 Invisibly returns a list containing the data that were written to file.

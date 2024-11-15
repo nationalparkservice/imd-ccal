@@ -23,16 +23,17 @@ remotes::install_github("nationalparkservice/imd-ccal")
 
 ## Example Data
 
-To demonstrate the functionality of imdccal, we created a fictitious
-CCAL deliverable that is downloaded with the package. The story behind
+To demonstrate the functionality of imdccal, we created two fictitious
+CCAL deliverables that are downloaded with the package. The story behind
 the data is that it is 2099 and the NPS now has an Outer Space Network
 with monitoring locations on the Moon, Mars, Mercury, and Saturn. Users
-can find the file path to the example data by running the following line
-of code. Since the example data is installed with the package, you can
-run any of the code in this ReadMe on your own computer.
+can find the file paths to the example data by running the following
+code chunk. Since the example data is installed with the package, you
+can run any of the code in this ReadMe on your own computer.
 
 ``` r
 system.file("extdata", "SPAC_080199.xlsx", package = "imdccal")
+system.file("extdata", "SPAC_081599.xlsx", package = "imdccal")
 ```
 
 ## Example: Creating Machine-Readable CCAL Data
@@ -47,7 +48,7 @@ library(imdccal)
 # Create tidied CCAL data from demo data stored in the imdccal package
 tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
 data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
 meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata # Get the metadata for the same set of results
 ```
@@ -96,6 +97,15 @@ machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one fi
 machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
 ```
 
+By default, these functions create separate tables and files for each
+CCAL deliverable supplied as input. To concatenate the results together,
+set the concat argument in `getCCALData()` or `machineReadableCCAL()` to
+TRUE.
+
+``` r
+machineReadableCCAL(all_files, destination_folder = "ccal_tidy", concat = TRUE)
+```
+
 ## Example: Creating the Results Table of the EQuIS EDD
 
 In addition to converting CCAL lab deliverables to a machine readable
@@ -127,7 +137,7 @@ data to any files:
 # Create results table from demo data stored in the imdccal package
 results_incomplete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
 ```
 
 If you inspect the table created above, you will notice that there are
@@ -166,7 +176,7 @@ below.
 results_complete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
                                    limits = limits)
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpk9sriX/temp_libpath3…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
 ```
 
 Users may also provide their own version of the qualifiers table, which
@@ -218,10 +228,10 @@ write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdc
               overwrite = TRUE)
 ```
 
-Finally, as before, all of these functions work when supplied with a
-vector of file paths to multiple CCAL deliverables. Here is an example
-of reading data from *multiple* files of CCAL lab data and writing the
-results tables to Excel or CSV files.
+As before, all of these functions work when supplied with a vector of
+file paths to multiple CCAL deliverables. Here is an example of reading
+data from *multiple* files of CCAL lab data and writing the results
+tables to Excel or CSV files.
 
 ``` r
 # Get file paths
@@ -240,4 +250,17 @@ write_results(files = all_files,
               format = "csv", 
               destination_folder = "ccal_tidy",
               overwrite = TRUE)
+```
+
+By default, these functions create separate tables and files for each
+CCAL deliverable supplied as input. To concatenate the results together,
+set the concat argument in `format_results()` or `write_results()` to
+TRUE.
+
+``` r
+write_results(files = all_files, 
+              limits = limits,
+              destination_folder = "ccal_tidy",
+              overwrite = TRUE,
+              concat = TRUE)
 ```

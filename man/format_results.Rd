@@ -7,7 +7,8 @@
 format_results(
   file_paths,
   limits = imdccal::limits,
-  qualifiers = imdccal::qualifiers
+  qualifiers = imdccal::qualifiers,
+  concat = FALSE
 )
 }
 \arguments{
@@ -16,6 +17,10 @@ format_results(
 \item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
 
 \item{qualifiers}{Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.}
+
+\item{concat}{If concat is set to TRUE, the output contains one table rather than one for every input file.
+By default, concat is set to FALSE, so the output contains separate tables for each file.
+If only one file path is supplied to the file_paths argument, this parameter does not affect the output.}
 }
 \value{
 The data formatted for input into the EQuIS system as the "Results" table.

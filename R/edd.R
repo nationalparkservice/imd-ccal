@@ -59,6 +59,9 @@ assign_detection_flags <- function(data, limits = imdccal::limits) {
 #' @param file_paths Path to .xlsx file delivered by CCAL.
 #' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
 #' @param qualifiers Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.
+#' @param concat If concat is set to TRUE, the output contains one table rather than one for every input file.
+#' By default, concat is set to FALSE, so the output contains separate tables for each file.
+#' If only one file path is supplied to the file_paths argument, this parameter does not affect the output.
 #'
 #' @return The data formatted for input into the EQuIS system as the "Results" table.
 #' Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
@@ -73,9 +76,10 @@ assign_detection_flags <- function(data, limits = imdccal::limits) {
 #' # Create results table
 #' results <- format_results(file_paths = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
 #'                           limits = limits)
-format_results <- function(file_paths, limits = imdccal::limits, qualifiers = imdccal::qualifiers){
+format_results <- function(file_paths, limits = imdccal::limits,
+                           qualifiers = imdccal::qualifiers, concat = FALSE){
 
-  edd_results <- getCCALData(file_paths) %>%
+  edd_results <- getCCALData(file_paths, concat) %>%
     lapply(function(x) {
     x[[1]] %>% # process CCAL data with function from original package
       handle_duplicates() %>% # remove duplicates
@@ -223,6 +227,9 @@ format_results <- function(file_paths, limits = imdccal::limits, qualifiers = im
 #' @inheritParams openxlsx::write.xlsx
 #' @param format File format to export machine readable data to - either "xlsx" or "csv"
 #' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
+#' @param concat If concat is set to TRUE, the function creates one file rather than one for every CCAL deliverable.
+#' By default, concat is set to FALSE, so the output contains separate files for each CCAL deliverable.
+#' If only one file path is supplied to the files argument, this parameter does not affect the output.
 #'
 #' @return Invisibly returns a list containing the data that were written to file.
 #' @export
@@ -250,11 +257,12 @@ format_results <- function(file_paths, limits = imdccal::limits, qualifiers = im
 #'               destination_folder = "ccal_tidy",
 #'               overwrite = TRUE)  # Write one folder of tidied CSV data per input file
 #' }
-write_results <- function(files, limits = imdccal::limits, qualifiers = imdccal::qualifiers, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
+write_results <- function(files, limits = imdccal::limits, qualifiers = imdccal::qualifiers, format = c("xlsx", "csv"),
+                          destination_folder = "./", overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- format_results(files, limits, qualifiers)  # Read in data
+  all_data <- format_results(files, limits, qualifiers, concat)  # Read in data
 
   write_data(all_data, format, destination_folder, overwrite, suffix = "_edd_results", num_tables = 1)
 
