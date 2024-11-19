@@ -48,7 +48,7 @@ library(imdccal)
 # Create tidied CCAL data from demo data stored in the imdccal package
 tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
 data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
 meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata # Get the metadata for the same set of results
 ```
@@ -117,7 +117,7 @@ table for the EDD.
 **Uses:**
 
 - Process data into one of the tables in the format accepted by EQuIS
-- Censor values less than MDL
+- Censor values less than or equal to the MDL
 - Raise the J-R flag for observations greater than the MDL but less than
   or equal to the LQL
 
@@ -137,7 +137,7 @@ data to any files:
 # Create results table from demo data stored in the imdccal package
 results_incomplete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
 ```
 
 If you inspect the table created above, you will notice that there are
@@ -176,7 +176,7 @@ below.
 results_complete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
                                    limits = limits)
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpwVcGiF/temp_libpathb…
+#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
 ```
 
 Users may also provide their own version of the qualifiers table, which

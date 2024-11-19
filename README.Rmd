@@ -109,7 +109,7 @@ Specifically, the `format_results()` function begins to format the data into the
 **Uses:**
 
 - Process data into one of the tables in the format accepted by EQuIS
-- Censor values less than MDL
+- Censor values less than or equal to the MDL
 - Raise the J-R flag for observations greater than the MDL but less than or equal to the LQL
 
 **Limitations:**
