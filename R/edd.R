@@ -95,9 +95,9 @@ format_results <- function(file_paths, limits = imdccal::limits,
              Result_Type = dplyr::if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
              Reportable_Result = NA) %>%
-      dplyr::left_join(qualifiers, by = c("flag" = "lookup_code")) %>%
-      dplyr::rename("Result_Qualifier" = "flag",
-                    "Result_Comment" = "remark.y") %>%
+      dplyr::left_join(qualifiers %>% rename("Result_Comment" = "remark"),
+                       by = c("flag" = "lookup_code")) %>%
+      dplyr::rename("Result_Qualifier" = "flag") %>%
       dplyr::mutate(Result_Status = "Pre-Cert") %>%
       dplyr::mutate(Upper_Quantification_Limit = NA,
              Limit_Comment = "Detection Limit Type = MDL",
@@ -175,7 +175,8 @@ format_results <- function(file_paths, limits = imdccal::limits,
              Taxonomist_Accreditation_Authority_Name = NA,
              Result_File_Name = NA,
              Lab_Reported_Result = value,
-             Source_Flags = comment, #paste(comment, flag_symbol, qa_description, sep = "... "),
+             Source_Flags = {if("comment" %in% names(.)) comment else NA},
+             # Source_Flags = paste(comment, flag_symbol, qa_description, sep = "... "),
              # Source_Flags = str_replace_all(Source_Flags, "NA... ", ""),
              # Source_Flags = str_replace_all(Source_Flags, "... NA", ""),
              # Source_Flags = if_else(Source_Flags == "NA", NA, Source_Flags),
