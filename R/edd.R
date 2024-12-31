@@ -95,7 +95,7 @@ format_results <- function(file_paths, limits = imdccal::limits,
              Result_Type = dplyr::if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
              Reportable_Result = NA) %>%
-      dplyr::left_join(qualifiers %>% rename("Result_Comment" = "remark"),
+      dplyr::left_join(qualifiers %>% dplyr::rename("Result_Comment" = "remark"),
                        by = c("flag" = "lookup_code")) %>%
       dplyr::rename("Result_Qualifier" = "flag") %>%
       dplyr::mutate(Result_Status = "Pre-Cert") %>%
