@@ -154,6 +154,11 @@ getCCALData <- function(files, concat = FALSE) {
                           dplyr::across(dplyr::contains("date"), tryParseDate),
                           dplyr::across(dplyr::contains("remark"), tryParseDate))
 
+    # Add column for file name
+    metadata <- metadata %>%
+      dplyr::mutate(input_file_name = basename(file)) %>%
+      dplyr::relocate(input_file_name)
+
     return(list(data = data,
                 metadata = metadata,
                 samples = samples,
