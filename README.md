@@ -254,7 +254,7 @@ write_results(files = all_files,
 
 By default, these functions create separate tables and files for each
 CCAL deliverable supplied as input. To concatenate the results together,
-set the concat argument in `format_results()` or `write_results()` to
+set the `concat` argument in `format_results()` or `write_results()` to
 TRUE.
 
 ``` r
