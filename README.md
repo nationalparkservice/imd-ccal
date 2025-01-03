@@ -99,7 +99,7 @@ machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")
 
 By default, these functions create separate tables and files for each
 CCAL deliverable supplied as input. To concatenate the results together,
-set the concat argument in `getCCALData()` or `machineReadableCCAL()` to
+set the `concat` argument in `getCCALData()` or `machineReadableCCAL()` to
 TRUE.
 
 ``` r
