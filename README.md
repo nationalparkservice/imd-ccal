@@ -32,7 +32,7 @@ code chunk. Since the example data is installed with the package, you
 can run any of the code in this ReadMe on your own computer.
 
 ``` r
-use_example_data()
+use_example_data(file_names = use_example_data())
 ```
 
 ## Example: Creating Machine-Readable CCAL Data
@@ -75,7 +75,7 @@ the machine-readable version to an Excel file or set of CSV files.
 # Write tidied CCAL data to file from demo data stored in imdccal package
 machineReadableCCAL(use_example_data(file_names = "SPAC_080199.xlsx"),
                     destination_folder = "ccal_tidy")  # Write tidied data to a new .xlsx
-machineReadableCCAL(use_example_data(file_names = "SPAC_080199.xlsx"), 
+machineReadableCCAL(use_example_data(file_names = "SPAC_081599.xlsx"), 
                     format = "csv", destination_folder = "ccal_tidy")  # Write tidied data to a folder of CSV files
 ```
 
@@ -219,7 +219,7 @@ write_results(files = use_example_data(file_names = "SPAC_080199.xlsx"),
               overwrite = TRUE)
 
 # Write results table to csv from demo data stored in imdccal package
-write_results(files = use_example_data(file_names = "SPAC_080199.xlsx"),
+write_results(files = use_example_data(file_names = "SPAC_081599.xlsx"),
               limits = limits,
               format = "csv",
               destination_folder = "ccal_tidy",
