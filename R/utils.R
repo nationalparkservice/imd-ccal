@@ -95,3 +95,28 @@ listParamsInQuestionableResults <- function(ccal_data) {
     )
   )
 }
+
+#' List the file name(s) or file paths of imdccal's example data
+#'
+#' @param file_names
+#'
+#' @returns If file_names is supplied, `use_example_data()` returns the full file path to the requested package data.
+#' Otherwise, it returns the file names of example data.
+#' @export
+#'
+#' @examples
+#' # List all example data file names
+#' use_example_data()
+#'
+#' # Find file path to one example data file
+#' use_example_data(file_names = "SPAC_080199.xlsx")
+#'
+#' # Find file path to all example data files
+#' use_example_data(file_names = use_example_data())
+use_example_data <- function(file_names = NULL) {
+  if (is.null(file_names)) {
+    dir(system.file("extdata", package = "imdccal"))
+  } else {
+    system.file("extdata", file_names, package = "imdccal", mustWork = TRUE)
+  }
+}

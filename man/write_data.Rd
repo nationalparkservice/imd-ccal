@@ -32,7 +32,7 @@ Write data to xlsx or csv file.
 \examples{
 \dontrun{
 # Create tidied CCAL data from demo data stored in the imdccal package
-tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 
 # Write data stored in environment to file
 write_data(all_data = tidy_ccal,

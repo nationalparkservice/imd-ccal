@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-#' tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 getCCALData <- function(files, concat = FALSE) {
   data <- purrr::map(files, function(file) {
 
@@ -205,8 +205,7 @@ getCCALData <- function(files, concat = FALSE) {
 #' @examples
 #' \dontrun{
 #' # Get file paths
-#' all_files <- list.files(system.file("extdata", package = "imdccal"),
-#'                        pattern = "*.xlsx$", full.names = TRUE)
+#' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
 #' machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
@@ -241,7 +240,7 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 #' @examples
 #' \dontrun{
 #' # Create tidied CCAL data from demo data stored in the imdccal package
-#' tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 #'
 #' # Write data stored in environment to file
 #' write_data(all_data = tidy_ccal,

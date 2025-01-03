@@ -36,6 +36,6 @@ limits <- imdccal::limits |>
   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
 
 # Create results table
-results <- format_results(file_paths = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+results <- format_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
                           limits = limits)
 }

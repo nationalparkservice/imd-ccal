@@ -20,7 +20,7 @@ Any other flags will need to be defined separately by the user.
 Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
 }
 \examples{
-tidy_ccal_flagged <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] \%>\%
+tidy_ccal_flagged <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] \%>\%
   handle_duplicates() \%>\%
   assign_detection_flags()
 }

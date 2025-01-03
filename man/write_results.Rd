@@ -44,8 +44,7 @@ limits <- imdccal::limits |>
   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
 
 # Get file paths
-all_files <- list.files(system.file("extdata", package = "imdccal"),
-                        pattern = "*.xlsx$", full.names = TRUE)
+all_files <- use_example_data(file_names = use_example_data())
 
 # Write to xlsx
 write_results(files = all_files,

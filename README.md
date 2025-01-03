@@ -32,8 +32,7 @@ code chunk. Since the example data is installed with the package, you
 can run any of the code in this ReadMe on your own computer.
 
 ``` r
-system.file("extdata", "SPAC_080199.xlsx", package = "imdccal")
-system.file("extdata", "SPAC_081599.xlsx", package = "imdccal")
+use_example_data()
 ```
 
 ## Example: Creating Machine-Readable CCAL Data
@@ -46,9 +45,9 @@ to any files.
 library(imdccal)
 
 # Create tidied CCAL data from demo data stored in the imdccal package
-tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
 data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
 meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata # Get the metadata for the same set of results
 ```
@@ -74,9 +73,9 @@ the machine-readable version to an Excel file or set of CSV files.
 
 ``` r
 # Write tidied CCAL data to file from demo data stored in imdccal package
-machineReadableCCAL(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+machineReadableCCAL(use_example_data(file_names = "SPAC_080199.xlsx"),
                     destination_folder = "ccal_tidy")  # Write tidied data to a new .xlsx
-machineReadableCCAL(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"), 
+machineReadableCCAL(use_example_data(file_names = "SPAC_080199.xlsx"), 
                     format = "csv", destination_folder = "ccal_tidy")  # Write tidied data to a folder of CSV files
 ```
 
@@ -87,8 +86,7 @@ version to an Excel files or sets of CSV files.
 
 ``` r
 # Get file paths
-all_files <- list.files(system.file("extdata", package = "imdccal"),
-                        pattern = "*.xlsx$", full.names = TRUE)
+all_files <- use_example_data(file_names = use_example_data())
 
 # Write to xlsx
 machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
@@ -99,8 +97,8 @@ machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")
 
 By default, these functions create separate tables and files for each
 CCAL deliverable supplied as input. To concatenate the results together,
-set the `concat` argument in `getCCALData()` or `machineReadableCCAL()` to
-TRUE.
+set the `concat` argument in `getCCALData()` or `machineReadableCCAL()`
+to TRUE.
 
 ``` r
 machineReadableCCAL(all_files, destination_folder = "ccal_tidy", concat = TRUE)
@@ -135,9 +133,9 @@ data to any files:
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_incomplete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+results_incomplete <- format_results(use_example_data(file_names = "SPAC_080199.xlsx"))
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
 ```
 
 If you inspect the table created above, you will notice that there are
@@ -173,10 +171,10 @@ below.
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_complete <- format_results(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+results_complete <- format_results(use_example_data(file_names = "SPAC_080199.xlsx"),
                                    limits = limits)
 #> Reading data from
-#> C:/Users/lsmith/AppData/Local/Temp/1/RtmpgXREM7/temp_libpath2…
+#> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
 ```
 
 Users may also provide their own version of the qualifiers table, which
@@ -214,14 +212,14 @@ to an Excel or CSV file.
 
 ``` r
 # Write results table to xlsx from demo data stored in imdccal package
-write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+write_results(files = use_example_data(file_names = "SPAC_080199.xlsx"),
               limits = limits,
               format = "xlsx",
               destination_folder = "ccal_tidy",
               overwrite = TRUE)
 
 # Write results table to csv from demo data stored in imdccal package
-write_results(files = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+write_results(files = use_example_data(file_names = "SPAC_080199.xlsx"),
               limits = limits,
               format = "csv",
               destination_folder = "ccal_tidy",
@@ -235,8 +233,7 @@ tables to Excel or CSV files.
 
 ``` r
 # Get file paths
-all_files <- list.files(system.file("extdata", package = "imdccal"),
-                        pattern = "*.xlsx$", full.names = TRUE)
+all_files <- use_example_data(file_names = use_example_data())
 
 # Write to xlsx
 write_results(files = all_files, 

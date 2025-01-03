@@ -34,8 +34,7 @@ Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx
 \examples{
 \dontrun{
 # Get file paths
-all_files <- list.files(system.file("extdata", package = "imdccal"),
-                       pattern = "*.xlsx$", full.names = TRUE)
+all_files <- use_example_data(file_names = use_example_data())
 
 # Write to xlsx
 machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file

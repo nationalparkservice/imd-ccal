@@ -20,5 +20,5 @@ A nested list. Each list item corresponds to one input file and contains data fr
 Read CCAL Data and convert to machine-readable format.
 }
 \examples{
-tidy_ccal <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))
+tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 }

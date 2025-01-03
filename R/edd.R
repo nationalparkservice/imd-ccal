@@ -6,7 +6,7 @@
 #' @export
 #'
 #' @examples
-#' tidy_ccal_no_dups <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] %>%
+#' tidy_ccal_no_dups <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
 #'   handle_duplicates()
 handle_duplicates <- function(data) {
 
@@ -35,7 +35,7 @@ handle_duplicates <- function(data) {
 #' @export
 #'
 #' @examples
-#' tidy_ccal_flagged <- getCCALData(system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"))[[1]][[1]] %>%
+#' tidy_ccal_flagged <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
 #'   handle_duplicates() %>%
 #'   assign_detection_flags()
 assign_detection_flags <- function(data, limits = imdccal::limits) {
@@ -74,7 +74,7 @@ assign_detection_flags <- function(data, limits = imdccal::limits) {
 #'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
 #'
 #' # Create results table
-#' results <- format_results(file_paths = system.file("extdata", "SPAC_080199.xlsx", package = "imdccal"),
+#' results <- format_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
 #'                           limits = limits)
 format_results <- function(file_paths, limits = imdccal::limits,
                            qualifiers = imdccal::qualifiers, concat = FALSE){
@@ -242,8 +242,7 @@ format_results <- function(file_paths, limits = imdccal::limits,
 #'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
 #'
 #' # Get file paths
-#' all_files <- list.files(system.file("extdata", package = "imdccal"),
-#'                         pattern = "*.xlsx$", full.names = TRUE)
+#' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
 #' write_results(files = all_files,
