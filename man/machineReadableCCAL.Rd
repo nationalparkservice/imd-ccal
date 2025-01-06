@@ -8,7 +8,8 @@ machineReadableCCAL(
   files,
   format = c("xlsx", "csv"),
   destination_folder = "./",
-  overwrite = FALSE
+  overwrite = FALSE,
+  concat = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,10 @@ machineReadableCCAL(
 \item{destination_folder}{Folder to save the data in. Defaults to current working directory. Folder must already exist.}
 
 \item{overwrite}{Overwrite existing file (Defaults to \code{TRUE} as with \code{write.table})}
+
+\item{concat}{If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
+By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
+If only one file path is supplied to the files argument, this parameter does not affect the output.}
 }
 \value{
 Invisibly returns a list containing the data that were written to file.
@@ -28,10 +33,14 @@ Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx
 }
 \examples{
 \dontrun{
-ccal_folder <- "ccal_results"
-dest_folder <- "ccal_results/tidied"
-file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-machineReadableCCAL(file_list, format = "xlsx", destination_folder = dest_folder)
-machineReadableCCAL(file_list, format = "csv", destination_folder = dest_folder)
+# Get file paths
+all_files <- use_example_data(file_names = use_example_data())
+
+# Write to xlsx
+machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+
+# Write to csv
+machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+
 }
 }

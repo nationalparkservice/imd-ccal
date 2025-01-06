@@ -4,3 +4,5 @@
 .Ruserdata
 docs
 *.xlsx
+!SPAC_080199.xlsx
+!SPAC_081599.xlsx

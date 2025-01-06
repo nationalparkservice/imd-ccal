@@ -1,17 +1,16 @@
-#' Read CCAL Data
+#' Read CCAL Data and convert to machine-readable format.
 #'
 #' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
+#' @param concat If concat is set to TRUE, the output contains one table for data, one for metadata, one for samples, and one for questionable, rather than one of each table for every input file.
+#' By default, concat is set to FALSE, so the output contains separate tables for each file.
+#' If only one file path is supplied to the files argument, this parameter does not affect the output.
 #'
 #' @return A nested list. Each list item corresponds to one input file and contains data frames for data and metadata.
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' my_folder <- "ccal_results"
-#' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#'}
-getCCALData <- function(files) {
+#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
+getCCALData <- function(files, concat = FALSE) {
   data <- purrr::map(files, function(file) {
 
     cli::cli_progress_message("Reading data from {file}...")
@@ -155,6 +154,11 @@ getCCALData <- function(files) {
                           dplyr::across(dplyr::contains("date"), tryParseDate),
                           dplyr::across(dplyr::contains("remark"), tryParseDate))
 
+    # Add column for file name
+    metadata <- metadata %>%
+      dplyr::mutate(input_file_name = basename(file)) %>%
+      dplyr::relocate(input_file_name)
+
     return(list(data = data,
                 metadata = metadata,
                 samples = samples,
@@ -163,7 +167,24 @@ getCCALData <- function(files) {
 
   names(data) <- basename(files)
 
-  return(data)
+  if(concat) {
+    data_concat <- purrr::map(seq_along(data[[1]]), function(i) {
+      dplyr::bind_rows(purrr::map(data, ~ .x[[i]]))
+    })
+
+    names(data_concat) = c("data", "metadata", "samples", "questionable")
+
+    data_concat <- list(data_concat)
+
+    names(data_concat) <- paste(names(data), collapse = "_") %>%
+      stringr::str_remove_all(".xlsx") %>%
+      paste0(".xlsx")
+
+    return(data_concat)
+  }
+  else {
+    return(data)
+  }
 }
 
 #' Wrangle CCAL data into a machine-readable format
@@ -171,6 +192,9 @@ getCCALData <- function(files) {
 #' Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx file or csv files in a folder.
 #'
 #' @inheritParams getCCALData
+#' @param concat If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
+#' By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
+#' If only one file path is supplied to the files argument, this parameter does not affect the output.
 #' @inheritParams openxlsx::write.xlsx
 #' @param format File format to export machine readable data to - either "xlsx" or "csv"
 #' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
@@ -180,42 +204,91 @@ getCCALData <- function(files) {
 #'
 #' @examples
 #' \dontrun{
-#' ccal_folder <- "ccal_results"
-#' dest_folder <- "ccal_results/tidied"
-#' file_list <- list.files(ccal_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' machineReadableCCAL(file_list, format = "xlsx", destination_folder = dest_folder)
-#' machineReadableCCAL(file_list, format = "csv", destination_folder = dest_folder)
+#' # Get file paths
+#' all_files <- use_example_data(file_names = use_example_data())
+#'
+#' # Write to xlsx
+#' machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+#'
+#' # Write to csv
+#' machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+#'
 #' }
-machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./", overwrite = FALSE) {
+machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
+                                overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- getCCALData(files)  # Read in data
+  all_data <- getCCALData(files, concat)  # Read in data
+
+  write_data(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
+
+  return(invisible(all_data))
+}
+
+#' Write data to xlsx or csv file.
+#'
+#' @param all_data The data to write to file.
+#' @param format File format to export machine readable data to - either "xlsx" or "csv"
+#' @inheritParams openxlsx::write.xlsx
+#' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
+#' @param suffix Suffix to add to output file name.
+#' @param num_tables Number of tables to write to file.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create tidied CCAL data from demo data stored in the imdccal package
+#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
+#'
+#' # Write data stored in environment to file
+#' write_data(all_data = tidy_ccal,
+#'           format = "xlsx", # alternatively, "csv"
+#'           destination_folder = "ccal_tidy", # must already exist
+#'           overwrite = TRUE,
+#'           suffix = "_tidy",
+#'           num_tables = 4)
+#' }
+write_data <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
+
+  format <- match.arg(format)
 
   lapply(names(all_data), function(filename) {
     data <- all_data[[filename]]
     data_name <- stringr::str_remove(filename, "\\.xlsx")
-    data_name <- paste0(data_name, "_tidy")
+    data_name <- paste0(data_name, suffix)
     if (format == "xlsx") {
       destination <- file.path(destination_folder, paste0(data_name, ".xlsx"))
       cli::cli_progress_message("Writing {destination}")
       openxlsx::write.xlsx(data, destination, overwrite = overwrite)
-    } else if (format == "csv") {
-      lapply(names(data), function(tbl_name) {
-        destination <- file.path(destination_folder, data_name, paste0(tbl_name, ".csv"))
-        if (!dir.exists(file.path(destination_folder, data_name))) {
-          dir.create(file.path(destination_folder, data_name))
-        }
+    }
+    else if (format == "csv") {
+      if (num_tables == 1) {
+        destination <- file.path(destination_folder, paste0(data_name, ".csv"))
         if (!file.exists(destination) || overwrite) {
           cli::cli_progress_message("Writing {destination}")
-          readr::write_csv(data[[tbl_name]], destination, append = FALSE)
-        } else {
+          readr::write_csv(data, destination, append = FALSE)
+        }
+        else {
           warning(paste(destination, "already exists."))
         }
+      }
+      else {
+        lapply(names(data), function(tbl_name) {
+          destination <- file.path(destination_folder, data_name, paste0(tbl_name, ".csv"))
+          if (!dir.exists(file.path(destination_folder, data_name))) {
+            dir.create(file.path(destination_folder, data_name))
+          }
+          if (!file.exists(destination) || overwrite) {
+            cli::cli_progress_message("Writing {destination}")
+            readr::write_csv(data[[tbl_name]], destination, append = FALSE)
+          }
+          else {
+            warning(paste(destination, "already exists."))
+          }
 
-      })
+        })
     }
-  })
-
-  return(invisible(all_data))
+  }})
 }

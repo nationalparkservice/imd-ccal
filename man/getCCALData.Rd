@@ -2,23 +2,23 @@
 % Please edit documentation in R/read_write.R
 \name{getCCALData}
 \alias{getCCALData}
-\title{Read CCAL Data}
+\title{Read CCAL Data and convert to machine-readable format.}
 \usage{
-getCCALData(files)
+getCCALData(files, concat = FALSE)
 }
 \arguments{
 \item{files}{Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.}
+
+\item{concat}{If concat is set to TRUE, the output contains one table for data, one for metadata, one for samples, and one for questionable, rather than one of each table for every input file.
+By default, concat is set to FALSE, so the output contains separate tables for each file.
+If only one file path is supplied to the files argument, this parameter does not affect the output.}
 }
 \value{
 A nested list. Each list item corresponds to one input file and contains data frames for data and metadata.
 }
 \description{
-Read CCAL Data
+Read CCAL Data and convert to machine-readable format.
 }
 \examples{
-\dontrun{
-my_folder <- "ccal_results"
-file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-all_ccal_data <- getCCALData(file_list)
-}
+tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
 }

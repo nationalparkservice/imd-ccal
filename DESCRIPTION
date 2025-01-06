@@ -3,19 +3,23 @@ Type: Package
 Title: Wrangle CCAL Data Into Machine Readable Format
 Version: 0.1.2
 Authors@R: 
-    person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0004-5060-2189"))
+    c(person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-5060-2189")),
+    person("Liam", "Smith", , "lsmith@nps.gov", , role = c("aut"),
+           comment = c(ORCID = "0009-0003-2811-1044")))
 Description: This package takes water quality data spreadsheets (.xlsx) as 
     delivered by the CCAL lab and reads them into R, including all metadata
     provided. Data can be exported to machine readable CSV or XLSX files that 
     can easily be analyzed, imported into database tables, or added to an NPS 
-    data package for publication.
+    data package for publication. Also includes functionality to format data 
+    into the Results table for inclusion in an EQuIS EDD.
 License: CC0
 Encoding: UTF-8
 LazyData: true
 Imports: 
     cli,
     dplyr,
+    fpCompare,
     janitor,
     lubridate,
     magrittr,
@@ -27,5 +31,7 @@ Imports:
     tidyr,
     tidyxl
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 URL: https://nationalparkservice.github.io/imd-ccal/
+Depends: 
+    R (>= 2.10)

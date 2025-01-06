@@ -6,7 +6,7 @@
 \alias{imdccal-package}
 \title{imdccal: Wrangle CCAL Data Into Machine Readable Format}
 \description{
-This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication.
+This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication. Also includes functionality to format data into the Results table for inclusion in an EQuIS EDD.
 }
 \seealso{
 Useful links:
@@ -17,6 +17,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Sarah Wright \email{sarah_wright@nps.gov} (\href{https://orcid.org/0009-0004-5060-2189}{ORCID})
+
+Authors:
+\itemize{
+  \item Liam Smith \email{lsmith@nps.gov} (\href{https://orcid.org/0009-0003-2811-1044}{ORCID})
+}
 
 }
 \keyword{internal}
