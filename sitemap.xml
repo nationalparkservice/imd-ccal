@@ -1,33 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/404.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/getCCALData.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/imdccal-package.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/listParamsInData.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/listParamsInQuestionableResults.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/machineReadableCCAL.html</loc>
-  </url>
-  <url>
-    <loc>https://nationalparkservice.github.io/imd-ccal/reference/rangeToVector.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/404.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/authors.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/index.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/assign_detection_flags.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/format_results.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/getCCALData.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/handle_duplicates.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/imdccal-package.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/index.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/limits.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/listParamsInData.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/listParamsInQuestionableResults.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/machineReadableCCAL.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/qualifiers.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/rangeToVector.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/use_example_data.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/write_data.html</loc></url>
+<url><loc>https://nationalparkservice.github.io/imd-ccal/reference/write_results.html</loc></url>
 </urlset>
+

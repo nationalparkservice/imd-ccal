@@ -5,48 +5,42 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication.">
 <title>Wrangle CCAL Data Into Machine Readable Format • imdccal</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Wrangle CCAL Data Into Machine Readable Format">
-<meta property="og:description" content="This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication.">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Wrangle CCAL Data Into Machine Readable Format">
+<meta name="description" content="This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication. Also includes functionality to format data into the Results table for inclusion in an EQuIS EDD.">
+<meta property="og:description" content="This package takes water quality data spreadsheets (.xlsx) as delivered by the CCAL lab and reads them into R, including all metadata provided. Data can be exported to machine readable CSV or XLSX files that can easily be analyzed, imported into database tables, or added to an NPS data package for publication. Also includes functionality to format data into the Results table for inclusion in an EQuIS EDD.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="index.html">imdccal</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav"></ul>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
+      </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-home">
 <div class="row">
@@ -55,38 +49,149 @@
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>The goal of imdccal is to extract data from water chemistry lab deliverables and convert it to a machine readable format.</p>
+<p>The goal of imdccal is to extract data from <a href="https://ccal.oregonstate.edu/" class="external-link">CCAL</a> water chemistry lab deliverables, convert it to a machine readable format, and begin processing it into the EQuIS EDD format.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of imdccal from <a href="https://github.com/nationalparkservice/nccn-climate" class="external-link">its GitHub repository</a> with:</p>
+<p>You can install the development version of imdccal from <a href="https://github.com/nationalparkservice/imd-ccal" class="external-link">its GitHub repository</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"nationalparkservice/imd-ccal"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>Read data from a single file of CCAL lab data and write a machine-readable version to an Excel file or set of CSV files:</p>
+<p>To demonstrate the functionality of imdccal, we created two fictitious CCAL deliverables that are downloaded with the package. The story behind the data is that it is 2099 and the NPS now has an Outer Space Network with monitoring locations on the Moon, Mars, Mercury, and Saturn. Users can find the file paths to the example data by running the following code chunk. Since the example data is installed with the package, you can run any of the code in this ReadMe on your own computer.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nationalparkservice.github.io/imd-ccal/">imdccal</a></span><span class="op">)</span></span>
-<span><span class="co"># We'll assume that you have the CCAL file and a folder called "ccal_tidy" in your working directory</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="st">"LVLD_101118.xlsx"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a new .xlsx</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="st">"LVLD_101118.xlsx"</span>, format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a folder of CSV files</span></span></code></pre></div>
-<p>Read data from <em>multiple</em> files of CCAL lab data and write a machine-readable version to an Excel files or sets of CSV files:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-creating-machine-readable-ccal-data">Example: Creating Machine-Readable CCAL Data<a class="anchor" aria-label="anchor" href="#example-creating-machine-readable-ccal-data"></a>
+</h2>
+<p>Read and tidy the data and work with it in R, without writing the data to any files.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nationalparkservice.github.io/imd-ccal/">imdccal</a></span><span class="op">)</span></span>
-<span><span class="co"># We'll assume that you have a folder full of CCAL files in a folder called "ccal", and a folder called "ccal_tidy" in your working directory</span></span>
-<span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"ccal"</span>, pattern <span class="op">=</span> <span class="st">"*.xlsx$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one file of tidied data per input file</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one folder of tidied CSV data per input file</span></span></code></pre></div>
-<p>Read and tidy the data and work with it in R, without writing the data to any files:</p>
+<code class="sourceCode R"><span><span class="co"># Load package</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nationalparkservice.github.io/imd-ccal/">imdccal</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create tidied CCAL data from demo data stored in the imdccal package</span></span>
+<span><span class="va">tidy_ccal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/getCCALData.html">getCCALData</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reading data from</span></span>
+<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">data</span>     <span class="co"># Get the data for a single set of lab results</span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">metadata</span> <span class="co"># Get the metadata for the same set of results</span></span></code></pre></div>
+<p>Write the tidied data that is currently stored in the R environment to file. Note that destination_folder must already exist.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nationalparkservice.github.io/imd-ccal/">imdccal</a></span><span class="op">)</span></span>
-<span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"ccal"</span>, pattern <span class="op">=</span> <span class="st">"*.xlsx$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">tidy_ccal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/getCCALData.html">getCCALData</a></span><span class="op">(</span><span class="va">all_files</span><span class="op">)</span></span>
-<span><span class="va">lvld_18_data</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`LVLD_101118.xlsx`</span><span class="op">$</span><span class="va">data</span>  <span class="co"># Get the data for a single set of lab results</span></span>
-<span><span class="va">lvld_18_meta</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`LVLD_101118.xlsx`</span><span class="op">$</span><span class="va">metadata</span> <span class="co"># Get the metadata for the same set of results</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Write data stored in environment to file</span></span>
+<span><span class="fu"><a href="reference/write_data.html">write_data</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">tidy_ccal</span>, </span>
+<span>           format <span class="op">=</span> <span class="st">"xlsx"</span>, <span class="co"># alternatively, "csv"</span></span>
+<span>           destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, <span class="co"># must already exist</span></span>
+<span>           overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>           suffix <span class="op">=</span> <span class="st">"_tidy"</span>,</span>
+<span>           num_tables <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p>Instead of the two step process of creating the tidied R object and writing it to file, users may use the <code><a href="reference/machineReadableCCAL.html">machineReadableCCAL()</a></code> function to create and write the tidied data to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the machine-readable version to an Excel file or set of CSV files.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Write tidied CCAL data to file from demo data stored in imdccal package</span></span>
+<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span>                    destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a new .xlsx</span></span>
+<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>, </span>
+<span>                    format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a folder of CSV files</span></span></code></pre></div>
+<p>All of these functions also work when supplied with a vector of file paths to multiple CCAL deliverables. Here is an example of reading data from <em>multiple</em> files of CCAL lab data and writing the machine-readable version to an Excel files or sets of CSV files.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get file paths</span></span>
+<span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Write to xlsx</span></span>
+<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one file of tidied data per input file</span></span>
+<span></span>
+<span><span class="co"># Write to csv</span></span>
+<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one folder of tidied CSV data per input file</span></span></code></pre></div>
+<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/getCCALData.html">getCCALData()</a></code> or <code><a href="reference/machineReadableCCAL.html">machineReadableCCAL()</a></code> to TRUE.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, concat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-creating-the-results-table-of-the-equis-edd">Example: Creating the Results Table of the EQuIS EDD<a class="anchor" aria-label="anchor" href="#example-creating-the-results-table-of-the-equis-edd"></a>
+</h2>
+<p>In addition to converting CCAL lab deliverables to a machine readable format, imdccal also provides functionality to begin processing the machine readable data into the EQuIS EDD format. Specifically, the <code><a href="reference/format_results.html">format_results()</a></code> function begins to format the data into the Results table for the EDD.</p>
+<p><strong>Uses:</strong></p>
+<ul>
+<li>Process data into one of the tables in the format accepted by EQuIS</li>
+<li>Censor values less than or equal to the MDL</li>
+<li>Raise the J-R flag for observations greater than the MDL but less than or equal to the LQL</li>
+</ul>
+<p><strong>Limitations:</strong></p>
+<ul>
+<li>Users still need to create Activities table for every deliverable and the Projects and Locations tables when they require edits.</li>
+<li>Within the Results table, users still need to define Activity_ID, modify Result_Status (set to Pre-Cert since additional QC is needed), add flags, and conduct the rest of their own QC processes</li>
+</ul>
+<p>Here we demonstrate the useage of this function. Read the data, create the Results table of the EDD, and work with it in R without writing the data to any files:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create results table from demo data stored in the imdccal package</span></span>
+<span><span class="va">results_incomplete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_results.html">format_results</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reading data from</span></span>
+<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span></code></pre></div>
+<p>If you inspect the table created above, you will notice that there are so many columns without data that the result is not useful. That’s because our code relies on a table containing detection limits for each analyte. To accommodate changes to detection limits over time, the table includes StartDate and EndDate columns. The issue we have above is that none of the limits are applicable after December 31, 2024, and our example data is from 2099.</p>
+<p>By default, <code><a href="reference/format_results.html">format_results()</a></code> uses the version of the table that is stored within the package. However, users may provide their own version of the table as an argument in the function if that better suits their needs. This may occur, for example, if detection limits change or if a user needs to include an analyte that is not yet in the table. To provide a different version of the table, start with the version stored in the package, and add rows or edit columns as you see fit. It may be helpful to review the documentation of the limits table (run <code><a href="reference/limits.html">?imdccal::limits</a></code>) as you make your edits. For example, we edit the EndDate for all relevant rows to December 31, 2099 in the code below.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Edit limits table</span></span>
+<span><span class="va">limits</span> <span class="op">&lt;-</span> <span class="fu">imdccal</span><span class="fu">::</span><span class="va"><a href="reference/limits.html">limits</a></span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>EndDate <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">EndDate</span> <span class="op">==</span> <span class="st">"2024-12-31"</span>, <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2099-12-31"</span><span class="op">)</span>, <span class="va">EndDate</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Users may also save the table to a csv or xlsx file and make changes directly to a spreadsheet. To use one’s updated table in <code><a href="reference/format_results.html">format_results()</a></code>, simply supply the function with the modified table (as an R object) as the limits argument. We do so with our example data below.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create results table from demo data stored in the imdccal package</span></span>
+<span><span class="va">results_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_results.html">format_results</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span>                                   limits <span class="op">=</span> <span class="va">limits</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reading data from</span></span>
+<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span></code></pre></div>
+<p>Users may also provide their own version of the qualifiers table, which contains the lookup_code and remark columns from <a href="https://doimspp.sharepoint.com/:x:/r/sites/nps-nrss-wrdiv/_layouts/15/Doc.aspx?sourcedoc=%7B897FC8B3-2F68-4353-BB79-C0FEE9C45991%7D&amp;file=NPS_EQuIS_WQX_Reference_Values.xlsx&amp;action=default&amp;mobileredirect=true" class="external-link">NPS_EQuIS_WQX_Reference_Values</a> after filtering for rows where the #lookup_type is “Result_Qualifier”. In this package the only flag we raise is “J-R”, so unless this flag’s description changes, the user has no need to use this argument. However, it is worth familiarizing oneself with the table as it is useful for further data processing. Run <code><a href="reference/qualifiers.html">?imdccal::qualifiers</a></code> to see the table’s documentation. In addition, users may benefit from reading through the <a href="https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&amp;sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&amp;ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&amp;OR=Teams-HL&amp;CT=1719255259520&amp;clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" class="external-link">NPS EQuIS Resources website</a>, which provides comprehensive guidelines on formatting data for EQuIS.</p>
+<p>Like with the machine readable data, we can write the results table from our R environment to file with the <code><a href="reference/write_data.html">write_data()</a></code> function.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Write data stored in environment to file</span></span>
+<span><span class="fu"><a href="reference/write_data.html">write_data</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">results_complete</span>, </span>
+<span>           format <span class="op">=</span> <span class="st">"xlsx"</span>, <span class="co"># alternatively, "csv"</span></span>
+<span>           destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, <span class="co"># must already exist</span></span>
+<span>           overwrite <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>           suffix <span class="op">=</span> <span class="st">"_edd_results"</span>, </span>
+<span>           num_tables <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>Also in the same manner as the machine readable data, instead of a two step process of creating the results table R object and writing it to file, users may use the <code><a href="reference/write_results.html">write_results()</a></code> function to create and write the results table to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the results table to an Excel or CSV file.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Write results table to xlsx from demo data stored in imdccal package</span></span>
+<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
+<span>              format <span class="op">=</span> <span class="st">"xlsx"</span>,</span>
+<span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
+<span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Write results table to csv from demo data stored in imdccal package</span></span>
+<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>,</span>
+<span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
+<span>              format <span class="op">=</span> <span class="st">"csv"</span>,</span>
+<span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
+<span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>As before, all of these functions work when supplied with a vector of file paths to multiple CCAL deliverables. Here is an example of reading data from <em>multiple</em> files of CCAL lab data and writing the results tables to Excel or CSV files.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get file paths</span></span>
+<span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Write to xlsx</span></span>
+<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
+<span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
+<span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Write to csv</span></span>
+<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
+<span>              format <span class="op">=</span> <span class="st">"csv"</span>, </span>
+<span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
+<span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/format_results.html">format_results()</a></code> or <code><a href="reference/write_results.html">write_results()</a></code> to TRUE.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
+<span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
+<span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>              concat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -108,6 +213,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Sarah Wright <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0004-5060-2189" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Liam Smith <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0003-2811-1044" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
@@ -118,19 +224,19 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sarah Wright.</p>
+  <p>Developed by Sarah Wright, Liam Smith.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
