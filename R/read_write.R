@@ -191,7 +191,7 @@ getCCALData <- function(files, concat = FALSE) {
 #'
 #' Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx file or csv files in a folder.
 #'
-#' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
+#' @inheritParams getCCALData
 #' @param concat If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
 #' By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
 #' If only one file path is supplied to the files argument, this parameter does not affect the output.
