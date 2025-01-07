@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples
-#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
-getCCALData <- function(files, concat = FALSE) {
+#' tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
+read_ccal <- function(files, concat = FALSE) {
   data <- purrr::map(files, function(file) {
 
     cli::cli_progress_message("Reading data from {file}...")
@@ -85,7 +85,7 @@ getCCALData <- function(files, concat = FALSE) {
                     orig_text = character) %>%
       dplyr::select(-character)
 
-    quest_results$lab_number <- rangeToVector(quest_results$lab_number)
+    quest_results$lab_number <- range_to_vector(quest_results$lab_number)
     quest_results <- tidyr::separate_longer_delim(quest_results, lab_number, delim = " ")
 
     # Create data frame for metadata
@@ -191,7 +191,7 @@ getCCALData <- function(files, concat = FALSE) {
 #'
 #' Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx file or csv files in a folder.
 #'
-#' @inheritParams getCCALData
+#' @inheritParams read_ccal
 #' @param concat If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
 #' By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
 #' If only one file path is supplied to the files argument, this parameter does not affect the output.
@@ -208,20 +208,20 @@ getCCALData <- function(files, concat = FALSE) {
 #' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
-#' machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+#' read_write_ccal(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
 #'
 #' # Write to csv
-#' machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+#' read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
 #'
 #' }
-machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
+read_write_ccal <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
                                 overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- getCCALData(files, concat)  # Read in data
+  all_data <- read_ccal(files, concat)  # Read in data
 
-  write_data(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
+  write_ccal(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
 
   return(invisible(all_data))
 }
@@ -240,17 +240,17 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 #' @examples
 #' \dontrun{
 #' # Create tidied CCAL data from demo data stored in the imdccal package
-#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
+#' tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
 #'
 #' # Write data stored in environment to file
-#' write_data(all_data = tidy_ccal,
+#' write_ccal(all_data = tidy_ccal,
 #'           format = "xlsx", # alternatively, "csv"
 #'           destination_folder = "ccal_tidy", # must already exist
 #'           overwrite = TRUE,
 #'           suffix = "_tidy",
 #'           num_tables = 4)
 #' }
-write_data <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
+write_ccal <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
 
   format <- match.arg(format)
 

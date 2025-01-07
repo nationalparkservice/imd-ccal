@@ -2,7 +2,7 @@
 #'
 #' Metadata including the detection limits for various analytes that are measured by CCAL and used by IMD.
 #'
-#' @format ## `limits`
+#' @format ## `detection_limits`
 #' A data frame with 15 rows and 11 columns:
 #' \describe{
 #'   \item{analysis}{The description of the analyte as found in the "Analysis" column at <https://ccal.oregonstate.edu/detection>.}
@@ -17,17 +17,17 @@
 #'   \item{StartDate}{We are confident the detection limits in a given row are valid on and after this date.}
 #'   \item{EndDate}{We are confident the detection limits in a given row are valid on and before this date.}
 #' }
-"limits"
+"detection_limits"
 
 #' EQuIS Flags
 #'
 #' Definitions of the various flags allowed by EQuIS.
 #'
-#' @format ## `qualifiers`
+#' @format ## `equis_qualifiers`
 #' A data frame with 231 rows and 2 columns:
 #' \describe{
 #'   \item{lookup_code}{The flag raised to represent a given concern about data.}
 #'   \item{remark}{A description of the meaning of a given flag.}
 #' }
 #' @source <https://doimspp.sharepoint.com/:x:/r/sites/nps-nrss-wrdiv/_layouts/15/Doc.aspx?sourcedoc=%7B897FC8B3-2F68-4353-BB79-C0FEE9C45991%7D&file=NPS_EQuIS_WQX_Reference_Values.xlsx&action=default&mobileredirect=true>
-"qualifiers"
+"equis_qualifiers"

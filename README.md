@@ -45,7 +45,7 @@ to any files.
 library(imdccal)
 
 # Create tidied CCAL data from demo data stored in the imdccal package
-tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
+tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
 #> Reading data from
 #> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
 data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
@@ -97,7 +97,7 @@ machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")
 
 By default, these functions create separate tables and files for each
 CCAL deliverable supplied as input. To concatenate the results together,
-set the `concat` argument in `getCCALData()` or `machineReadableCCAL()`
+set the `concat` argument in `read_ccal()` or `machineReadableCCAL()`
 to TRUE.
 
 ``` r
@@ -109,7 +109,7 @@ machineReadableCCAL(all_files, destination_folder = "ccal_tidy", concat = TRUE)
 In addition to converting CCAL lab deliverables to a machine readable
 format, imdccal also provides functionality to begin processing the
 machine readable data into the EQuIS EDD format. Specifically, the
-`format_results()` function begins to format the data into the Results
+`format_equis_results()` function begins to format the data into the Results
 table for the EDD.
 
 **Uses:**
@@ -133,7 +133,7 @@ data to any files:
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_incomplete <- format_results(use_example_data(file_names = "SPAC_080199.xlsx"))
+results_incomplete <- format_equis_results(use_example_data(file_names = "SPAC_080199.xlsx"))
 #> Reading data from
 #> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
 ```
@@ -146,7 +146,7 @@ includes StartDate and EndDate columns. The issue we have above is that
 none of the limits are applicable after December 31, 2024, and our
 example data is from 2099.
 
-By default, `format_results()` uses the version of the table that is
+By default, `format_equis_results()` uses the version of the table that is
 stored within the package. However, users may provide their own version
 of the table as an argument in the function if that better suits their
 needs. This may occur, for example, if detection limits change or if a
@@ -154,24 +154,24 @@ user needs to include an analyte that is not yet in the table. To
 provide a different version of the table, start with the version stored
 in the package, and add rows or edit columns as you see fit. It may be
 helpful to review the documentation of the limits table (run
-`?imdccal::limits`) as you make your edits. For example, we edit the
+`?imdccal::detection_limits`) as you make your edits. For example, we edit the
 EndDate for all relevant rows to December 31, 2099 in the code below.
 
 ``` r
 # Edit limits table
-limits <- imdccal::limits |>
+limits <- imdccal::detection_limits |>
   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
 ```
 
 Users may also save the table to a csv or xlsx file and make changes
 directly to a spreadsheet. To use one’s updated table in
-`format_results()`, simply supply the function with the modified table
+`format_equis_results()`, simply supply the function with the modified table
 (as an R object) as the limits argument. We do so with our example data
 below.
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_complete <- format_results(use_example_data(file_names = "SPAC_080199.xlsx"),
+results_complete <- format_equis_results(use_example_data(file_names = "SPAC_080199.xlsx"),
                                    limits = limits)
 #> Reading data from
 #> C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…
@@ -184,7 +184,7 @@ after filtering for rows where the \#lookup_type is “Result_Qualifier”.
 In this package the only flag we raise is “J-R”, so unless this flag’s
 description changes, the user has no need to use this argument. However,
 it is worth familiarizing oneself with the table as it is useful for
-further data processing. Run `?imdccal::qualifiers` to see the table’s
+further data processing. Run `?imdccal::equis_qualifiers` to see the table’s
 documentation. In addition, users may benefit from reading through the
 [NPS EQuIS Resources
 website](https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&OR=Teams-HL&CT=1719255259520&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D),
@@ -251,7 +251,7 @@ write_results(files = all_files,
 
 By default, these functions create separate tables and files for each
 CCAL deliverable supplied as input. To concatenate the results together,
-set the `concat` argument in `format_results()` or `write_results()` to
+set the `concat` argument in `format_equis_results()` or `write_results()` to
 TRUE.
 
 ``` r

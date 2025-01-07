@@ -31,8 +31,8 @@ tryParseDate <- function(date_chr, try_fns = list(lubridate::mdy_hms, lubridate:
 #' @export
 #'
 #' @examples
-#' rangeToVector("1 3 5-8 10")
-rangeToVector <- Vectorize(function(numbers, separator = " ") {
+#' range_to_vector("1 3 5-8 10")
+range_to_vector <- Vectorize(function(numbers, separator = " ") {
   if (is.na(numbers) || length(numbers) == 0) {
     return(NA)
   }
@@ -50,7 +50,7 @@ rangeToVector <- Vectorize(function(numbers, separator = " ") {
 
 #' List every parameter that occurs in the data
 #'
-#' @param ccal_data The list object returned by `getCCALData`
+#' @param ccal_data The list object returned by `read_ccal`
 #'
 #' @return A character vector of parameter codes
 #' @export
@@ -58,9 +58,9 @@ rangeToVector <- Vectorize(function(numbers, separator = " ") {
 #' @examples
 #' my_folder <- "ccal_results"
 #' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#' parameters <- listParamsInData(all_ccal_data)
-listParamsInData <- function(ccal_data) {
+#' all_ccal_data <- read_ccal(file_list)
+#' parameters <- get_data_params(all_ccal_data)
+get_data_params <- function(ccal_data) {
   unique(
     unlist(
       lapply(ccal_data, function(l) {
@@ -74,7 +74,7 @@ listParamsInData <- function(ccal_data) {
 
 #' List every parameter name that occurs in the questionable results
 #'
-#' @param ccal_data The list object returned by `getCCALData`
+#' @param ccal_data The list object returned by `read_ccal`
 #'
 #' @return A character vector of parameter names
 #' @export
@@ -82,9 +82,9 @@ listParamsInData <- function(ccal_data) {
 #' @examples
 #' my_folder <- "ccal_results"
 #' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#' param_names <- listParamsInQuestionableResults(all_ccal_data)
-listParamsInQuestionableResults <- function(ccal_data) {
+#' all_ccal_data <- read_ccal(file_list)
+#' param_names <- get_questionable_params(all_ccal_data)
+get_questionable_params <- function(ccal_data) {
   unique(
     unlist(
       lapply(ccal_data, function(l) {
