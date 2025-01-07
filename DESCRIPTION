@@ -34,4 +34,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 URL: https://nationalparkservice.github.io/imd-ccal/
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
