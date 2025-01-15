@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  eval = FALSE
 )
 ```
 
@@ -132,7 +133,7 @@ By default, `format_equis_results()` uses the version of the table that is store
 However, users may provide their own version of the table as an argument in the function if that better suits their needs.
 This may occur, for example, if detection limits change or if a user needs to include an analyte that is not yet in the table.
 To provide a different version of the table, start with the version stored in the package, and add rows or edit columns as you see fit.
-It may be helpful to review the documentation of the limits table (run `?imdccal::limits`) as you make your edits.
+It may be helpful to review the documentation of the limits table (run `?imdccal::detection_limits`) as you make your edits.
 For example, we edit the EndDate for all relevant rows to December 31, 2099 in the code below.
 
 ```{r}
