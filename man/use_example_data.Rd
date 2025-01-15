@@ -7,7 +7,7 @@
 use_example_data(file_names = NULL)
 }
 \arguments{
-\item{file_names}{}
+\item{file_names}{Optional. File name of requested example data. For a list of available example data files, omit this argument.}
 }
 \value{
 If file_names is supplied, \code{use_example_data()} returns the full file path to the requested package data.

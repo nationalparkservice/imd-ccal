@@ -208,10 +208,12 @@ read_ccal <- function(files, concat = FALSE) {
 #' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
-#' read_write_ccal(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+#' # Writes one file of tidied data per input file
+#' read_write_ccal(all_files, destination_folder = "ccal_tidy")
 #'
 #' # Write to csv
-#' read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+#' # Writes one folder of tidied CSV data per input file
+#' read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")
 #'
 #' }
 read_write_ccal <- function(files, format = c("xlsx", "csv"), destination_folder = "./",

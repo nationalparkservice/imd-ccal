@@ -71,7 +71,9 @@ assign_detection_flags <- function(data, limits = imdccal::detection_limits) {
 #' @examples
 #' # Edit limits table to work with example data
 #' limits <- imdccal::detection_limits |>
-#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31",
+#'                                          lubridate::ymd("2099-12-31"),
+#'                                          EndDate))
 #'
 #' # Create results table
 #' results <- format_equis_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
@@ -239,7 +241,9 @@ format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
 #' \dontrun{
 #' # Edit limits table to work with example data
 #' limits <- imdccal::detection_limits |>
-#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31",
+#'                                          lubridate::ymd("2099-12-31"),
+#'                                          EndDate))
 #'
 #' # Get file paths
 #' all_files <- use_example_data(file_names = use_example_data())

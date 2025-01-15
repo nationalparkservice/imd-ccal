@@ -36,7 +36,7 @@ range_to_vector <- Vectorize(function(numbers, separator = " ") {
   if (is.na(numbers) || length(numbers) == 0) {
     return(NA)
   }
-  ranges <- unlist(stringr::str_extract_all(numbers, "\\d+\\s*(–|-)\\s*\\d+"))
+  ranges <- unlist(stringr::str_extract_all(numbers, "\\d+\\s*(\u2013|\u2D)\\s*\\d+"))  #\u2D and \u2013 are unicode dashes
   sapply(ranges, function(range) {
     start <- stringr::str_extract(range, "^\\d+")
     end <- stringr::str_extract(range, "\\d+$")
@@ -98,7 +98,7 @@ get_questionable_params <- function(ccal_data) {
 
 #' List the file name(s) or file paths of imdccal's example data
 #'
-#' @param file_names
+#' @param file_names Optional. File name of requested example data. For a list of available example data files, omit this argument.
 #'
 #' @returns If file_names is supplied, `use_example_data()` returns the full file path to the requested package data.
 #' Otherwise, it returns the file names of example data.

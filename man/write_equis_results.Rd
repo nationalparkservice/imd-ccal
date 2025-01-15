@@ -41,7 +41,9 @@ Write the results table of the EQuIS EDD.
 \dontrun{
 # Edit limits table to work with example data
 limits <- imdccal::detection_limits |>
-  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31",
+                                         lubridate::ymd("2099-12-31"),
+                                         EndDate))
 
 # Get file paths
 all_files <- use_example_data(file_names = use_example_data())
