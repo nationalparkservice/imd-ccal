@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 # imdccal
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/nationalparkservice/imd-ccal/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nationalparkservice/imd-ccal/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of imdccal is to extract data from [CCAL](https://ccal.oregonstate.edu/) water chemistry lab deliverables, convert it to a machine readable format, and begin processing it into the EQuIS EDD format.
