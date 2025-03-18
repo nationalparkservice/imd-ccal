@@ -48,8 +48,10 @@ library(imdccal)
 
 # Create tidied CCAL data from demo data stored in the imdccal package
 tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
-data <- tidy_ccal$`SPAC_080199.xlsx`$data     # Get the data for a single set of lab results
-meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata # Get the metadata for the same set of results
+# Get the data for a single set of lab results
+data <- tidy_ccal$`SPAC_080199.xlsx`$data     
+# Get the metadata for the same set of results
+meta <- tidy_ccal$`SPAC_080199.xlsx`$metadata 
 ```
 
 Write the tidied data that is currently stored in the R environment to
@@ -73,10 +75,14 @@ machine-readable version to an Excel file or set of CSV files.
 
 ``` r
 # Write tidied CCAL data to file from demo data stored in imdccal package
+
+# Write tidied data to a new .xlsx
 read_write_ccal(use_example_data(file_names = "SPAC_080199.xlsx"),
-                    destination_folder = "ccal_tidy")  # Write tidied data to a new .xlsx
+                    destination_folder = "ccal_tidy") 
+
+# Write tidied data to a folder of CSV files
 read_write_ccal(use_example_data(file_names = "SPAC_081599.xlsx"), 
-                    format = "csv", destination_folder = "ccal_tidy")  # Write tidied data to a folder of CSV files
+                    format = "csv", destination_folder = "ccal_tidy")  
 ```
 
 All of these functions also work when supplied with a vector of file
@@ -89,10 +95,12 @@ version to an Excel files or sets of CSV files.
 all_files <- use_example_data(file_names = use_example_data())
 
 # Write to xlsx
-read_write_ccal(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+# Write one file of tidied data per input file
+read_write_ccal(all_files, destination_folder = "ccal_tidy")  
 
 # Write to csv
-read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+# Write one folder of tidied CSV data per input file
+read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")  
 ```
 
 By default, these functions create separate tables and files for each
@@ -133,7 +141,8 @@ data to any files:
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_incomplete <- format_equis_results(use_example_data(file_names = "SPAC_080199.xlsx"))
+results_incomplete <- format_equis_results(
+  use_example_data(file_names = "SPAC_080199.xlsx"))
 ```
 
 If you inspect the table created above, you will notice that there are
@@ -159,7 +168,9 @@ below.
 ``` r
 # Edit limits table
 limits <- imdccal::detection_limits |>
-  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+  dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", 
+                                         lubridate::ymd("2099-12-31"), 
+                                         EndDate))
 ```
 
 Users may also save the table to a csv or xlsx file and make changes
@@ -170,8 +181,9 @@ data below.
 
 ``` r
 # Create results table from demo data stored in the imdccal package
-results_complete <- format_equis_results(use_example_data(file_names = "SPAC_080199.xlsx"),
-                                   limits = limits)
+results_complete <- format_equis_results(
+  use_example_data(file_names = "SPAC_080199.xlsx"),
+  limits = limits)
 ```
 
 Users may also provide their own version of the qualifiers table, which
