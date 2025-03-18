@@ -7,16 +7,16 @@
 range_to_vector(numbers, separator = " ")
 }
 \arguments{
-\item{numbers}{Character vector containing a number range indicated by a dash (e.g. "123 - 456")}
+\item{numbers}{Character vector containing a number range indicated by a dash (e.g. "123 - 456"). Numbers outside of range must be separated by whitespace (e.g. "1 3 5-9"). Number range can be ascending or descending but cannot contain negative numbers. "-123 - 456" is NOT valid input. No non-numeric characters are permitted, except for whitespace and dashes.}
 
-\item{separator}{Character string to use as a separator between numbers}
+\item{separator}{Character string to use as a separator between numbers in output.}
 }
 \value{
 The same character vector, but with number ranges removed and replaced with the numbers in the range explicitly listed.
 }
 \description{
-Takes a character vector containing a number range (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
+Takes a character vector containing a range of numeric IDs (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
 }
-\examples{
-range_to_vector("1 3 5-8 10")
+\details{
+Does NOT work with negative numbers.
 }

@@ -22,20 +22,21 @@ tryParseDate <- function(date_chr, try_fns = list(lubridate::mdy_hms, lubridate:
 
 #' Expand Number Range in Text to All Numbers in Range
 #'
-#' Takes a character vector containing a number range (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
+#' Takes a character vector containing a range of numeric IDs (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
+#' @details
+#' Does NOT work with negative numbers.
 #'
-#' @param numbers Character vector containing a number range indicated by a dash (e.g. "123 - 456")
-#' @param separator Character string to use as a separator between numbers
+#'
+#' @param numbers Character vector containing a number range indicated by a dash (e.g. "123 - 456"). Numbers outside of range must be separated by whitespace (e.g. "1 3 5-9"). Number range can be ascending or descending but cannot contain negative numbers. "-123 - 456" is NOT valid input. No non-numeric characters are permitted, except for whitespace and dashes.
+#' @param separator Character string to use as a separator between numbers in output.
 #'
 #' @return The same character vector, but with number ranges removed and replaced with the numbers in the range explicitly listed.
-#' @export
 #'
-#' @examples
-#' range_to_vector("1 3 5-8 10")
 range_to_vector <- Vectorize(function(numbers, separator = " ") {
   if (is.na(numbers) || length(numbers) == 0) {
     return(NA)
   }
+  numbers <- stringr::str_replace_all(numbers, "\\s+", " ")  # replace all whitespace with single space
   ranges <- unlist(stringr::str_extract_all(numbers, "\\d+\\s*(\u2013|\u2D)\\s*\\d+"))  #\u2D and \u2013 are unicode dashes
   sapply(ranges, function(range) {
     start <- stringr::str_extract(range, "^\\d+")
@@ -44,9 +45,13 @@ range_to_vector <- Vectorize(function(numbers, separator = " ") {
     numbers <<- stringr::str_replace(numbers, range, seq)
   })
 
+  # Check for non-numeric characters in final result and throw error if found
+  if (grepl(pattern = "[^\\d|\\s]", numbers, perl = TRUE)) {
+    cli::cli_abort("Numeric IDs are improperly formatted. Special characters (except for a dash indicating a numeric range) are not supported, nor are negative IDs.")
+  }
+
   return(numbers)
 }, USE.NAMES = FALSE)
-
 
 #' List every parameter that occurs in the data
 #'
