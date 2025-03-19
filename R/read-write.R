@@ -104,6 +104,23 @@ read_ccal <- function(files, concat = FALSE) {
     questionable <- dplyr::filter(quest_results, !(is.na(lab_number) | is.null(lab_number))) %>%
       dplyr::mutate(parameter = getParamCrosswalk(param_description))
 
+    # Handle duplicates in questionable results
+    questionable_dups <- questionable %>%
+      dplyr::group_by(lab_number, parameter) %>%
+      dplyr::summarise(dups = dplyr::n()) %>%
+      dplyr::filter(dups > 1)
+    dups_present <- nrow(questionable_dups) > 0
+
+    if (dups_present) {
+      dup_samples <- paste(questionable_dups$lab_number, questionable_dups$parameter, sep = ": ")
+      warning <- c("!" = "Questionable results contain duplicate rows:",
+                   "!" = "See samples: {dup_samples}.",
+                   "i" = "This may be caused by lab error, or may be a result of one analyte being compared to more than one other analyte.",
+                   "i" = "See the {.envvar questionable} table returned by this function.")
+
+      cli::cli_warn(warning)
+    }
+
     # Get additional questionable results comments that aren't tied to specific sample numbers and put them in the metadata
     extra_comments <- dplyr::filter(quest_results, is.na(lab_number) | is.null(lab_number))
     extra_comments <- paste(extra_comments$orig_text, collapse = "; ")
@@ -119,7 +136,7 @@ read_ccal <- function(files, concat = FALSE) {
       tidyr::separate(param, c("parameter", "unit"), sep = "\\(", fill = "right") %>%
       dplyr::mutate(parameter = stringr::str_replace(parameter, "\\.\\.\\.\\d+", ""),
                     date = dplyr::lead(value)) %>%
-      dplyr::filter(!grepl("date", parameter, ignore.case= TRUE)) %>%
+      dplyr::filter(!grepl("date", parameter, ignore.case = TRUE)) %>%
       dplyr::mutate(repeat_measurement = stringr::str_extract(parameter, "^.*icate "),
                     flag_symbol = stringr::str_remove_all(value, "[\\d\\.]"),
                     parameter = ifelse(is.na(repeat_measurement), parameter, stringr::str_remove(parameter, repeat_measurement)),
@@ -129,11 +146,19 @@ read_ccal <- function(files, concat = FALSE) {
                     unit = stringr::str_remove(unit, "\\)"),
                     repeat_measurement = stringr::str_to_lower(trimws(repeat_measurement))) %>%
       dplyr::filter(!is.na(value)) %>%
-      janitor::clean_names() %>%
-      dplyr::left_join(questionable, by = c("parameter", "lab_number")) %>%
-      dplyr::select(-param_description, -comparison, -assessment) %>%
-      dplyr::rename(qa_within_precision_limits = within_precision_limits,
-                    qa_description = orig_text)
+      janitor::clean_names()
+
+      ## Code commented out below allows qa columns to be added if no duplicate questionable results are present
+      ## HOWEVER, it doesn't work when concat == TRUE if qa columns are omitted from some results but not others
+      ## May be worth handling this logic in the future if it's requested, but otherwise it's simpler to let people do the joins on their own
+      # if (try_qa_join && !dups_present) {
+      #   data <- data %>%
+      #     dplyr::left_join(questionable, by = c("parameter", "lab_number")) %>%
+      #     dplyr::select(-param_description, -comparison, -assessment) %>%
+      #     dplyr::rename(qa_within_precision_limits = within_precision_limits,
+      #                   qa_description = orig_text)
+      # }
+
 
     # Trim whitespace, replace empty strings with NA, and attempt to parse dates and times
     metadata <- dplyr::mutate(metadata,

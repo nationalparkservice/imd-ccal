@@ -1,8 +1,14 @@
-test_files <- use_example_data(c("SPAC_080199.xlsx", "SPAC_081599.xlsx"))
-data <- read_ccal(test_files[1])
+test_files <- use_example_data(c("SPAC_080199.xlsx", "SPAC_081599.xlsx", "SPAC_082099.xlsx"))
+# data <- read_ccal(test_files[1])
+
+test_that("read_ccal throws a warning when there are duplicate questionable results", {
+  expect_warning(read_ccal(test_files[1]), regexp = ".*Questionable results contain duplicate rows.*")
+  expect_warning(read_ccal(test_files[2]), regexp = ".*Questionable results contain duplicate rows.*")
+  expect_no_warning(data <- read_ccal(test_files[3]))
+})
 
 test_that("read_ccal output is structured correctly", {
-
+  data <- read_ccal(test_files[3])  # Use the one that doesn't throw a duplicates warning
   expect_type(data, "list")
   expect_equal(names(data), "SPAC_080199.xlsx")
   expect_equal(names(data$SPAC_080199.xlsx), c("data", "metadata", "samples", "questionable"))
@@ -11,8 +17,7 @@ test_that("read_ccal output is structured correctly", {
                                                     "lab_number", "site_id", "remark",
                                                     "delivery_date", "comment", "parameter",
                                                     "unit", "value", "date", "repeat_measurement",
-                                                    "flag_symbol", "qa_within_precision_limits",
-                                                    "qa_description"))
+                                                    "flag_symbol"))
   expect_equal(names(data$SPAC_080199.xlsx$metadata), c("input_file_name", "investigator",
                                                         "delivery_date", "sample_location",
                                                         "sample_numbers", "project_code",
