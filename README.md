@@ -13,13 +13,17 @@
 imdccal is an R Package designed to help users work with water chemistry
 lab deliverables from the [Cooperative Chemical Analytical
 Laboratory](https://ccal.oregonstate.edu/) (CCAL) at Oregon State
-University. Functions such as `read_ccal()` and `format_equis_results()`
-help users extract data from .xlsx files provided by CCAL, convert them
-to a machine readable format, and begin processing them into the
+University.
+
+Functions such as `read_ccal()` and `format_equis_results()` help users
+extract data from .xlsx files provided by CCAL, convert them to a
+machine readable format, and begin processing them into the
 Environmental Quality Information Systems (EQuIS) Electronic Data
-Deliverable (EDD) format. The package is primarily geared towards data
-management in the Inventory & Monitoring Division (IMD) of the National
-Park Service, but may be useful for other users of CCAL data.
+Deliverable (EDD) format.
+
+The package is primarily geared towards data management in the Inventory
+& Monitoring Division (IMD) of the National Park Service, but may be
+useful for other users of CCAL data.
 
 imdccal was developed by [Sarah
 Wright](https://orcid.org/0009-0004-5060-2189) and [Liam
@@ -27,6 +31,13 @@ Smith](https://orcid.org/0009-0003-2811-1044) and is maintained by Sarah
 Wright. Please reach out via
 [Issues](https://github.com/nationalparkservice/imd-ccal/issues) with
 any ideas for improvement.
+
+**Disclaimer:** This package does its best to parse human-entered data.
+However, lab deliverables are known to vary across projects and over
+time. This package will never be able to predict every variation in the
+input data, although we will do our best to update it as we learn of new
+edge cases. As with any software, a knowledgeable human should ALWAYS
+verify that its outputs are correct and complete.
 
 ## Installation
 
