@@ -1,8 +1,8 @@
-#' Remove lab duplicates and other duplicate rows.
+#' Remove lab duplicates.
 #'
 #' @param data The "data" table produced by read_ccal().
 #'
-#' @return The data after lab QC duplicates have been removed and any duplicate rows resulting from the presence of multiple flags for one measurement have been removed.
+#' @return The data after lab QC duplicates have been removed.
 #' @export
 #'
 #' @examples
@@ -13,13 +13,6 @@ remove_ccal_duplicates <- function(data) {
   # Drop lab duplicates
   data <- data %>%
     dplyr::filter(is.na(repeat_measurement))
-
-  # Concatenate duplicated rows due to different qa flags from CCAL
-  data <- data %>%
-    dplyr::group_by(dplyr::across(-c(qa_description, qa_within_precision_limits))) %>%
-    dplyr::summarise(qa_description = paste(qa_description, collapse = "... ")) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(qa_description = dplyr::if_else(qa_description == "NA", NA, qa_description)) # fix NA issue
 
   return(data)
 }
