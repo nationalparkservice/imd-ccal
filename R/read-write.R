@@ -132,7 +132,7 @@ read_ccal <- function(files, concat = FALSE) {
     last_date_col <- max(grep("^date(\\.\\.\\.\\d+){0,1}$", names(data), ignore.case = TRUE))
     names(data) <- trimws(names(data))
     data <- data %>%
-      tidyr::pivot_longer(first_chem_col:last_date_col, names_to = "param") %>%
+      tidyr::pivot_longer(dplyr::all_of(first_chem_col:last_date_col), names_to = "param") %>%
       tidyr::separate(param, c("parameter", "unit"), sep = "\\(", fill = "right") %>%
       dplyr::mutate(parameter = stringr::str_replace(parameter, "\\.\\.\\.\\d+", ""),
                     date = dplyr::lead(value)) %>%

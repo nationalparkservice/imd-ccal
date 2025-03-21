@@ -1,13 +1,12 @@
 test_files <- use_example_data(c("SPAC_080199.xlsx", "SPAC_081599.xlsx"))
-# data <- read_ccal(test_files[1])
 
 test_that("read_ccal throws a warning when there are duplicate questionable results", {
-  expect_warning(read_ccal(test_files[1]), regexp = ".*Questionable results contain duplicate rows.*")
-  expect_no_warning(read_ccal(test_files[2]))
+  expect_warning(suppressMessages(read_ccal(test_files[1])), regexp = ".*Questionable results contain duplicate rows.*")
+  expect_no_warning(suppressMessages(read_ccal(test_files[2])))
 })
 
 test_that("read_ccal output is structured correctly", {
-  data <- read_ccal(test_files[2])  # Use the one that doesn't throw a duplicates warning
+  data <- suppressMessages(read_ccal(test_files[2]))  # Use the one that doesn't throw a duplicates warning
   expect_type(data, "list")
   expect_equal(names(data), "SPAC_081599.xlsx")
   expect_equal(names(data$SPAC_081599.xlsx), c("data", "metadata", "samples", "questionable"))
