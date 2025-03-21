@@ -2,7 +2,7 @@
 % Please edit documentation in R/edd.R
 \name{remove_ccal_duplicates}
 \alias{remove_ccal_duplicates}
-\title{Remove lab duplicates and other duplicate rows.}
+\title{Remove lab duplicates.}
 \usage{
 remove_ccal_duplicates(data)
 }
@@ -10,10 +10,10 @@ remove_ccal_duplicates(data)
 \item{data}{The "data" table produced by read_ccal().}
 }
 \value{
-The data after lab QC duplicates have been removed and any duplicate rows resulting from the presence of multiple flags for one measurement have been removed.
+The data after lab QC duplicates have been removed.
 }
 \description{
-Remove lab duplicates and other duplicate rows.
+Remove lab duplicates.
 }
 \examples{
 tidy_ccal_no_dups <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] \%>\%
