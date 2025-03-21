@@ -4,7 +4,7 @@
 \alias{read_ccal}
 \title{Read CCAL Data and convert to machine-readable format.}
 \usage{
-read_ccal(files, concat = FALSE, try_qa_join = TRUE)
+read_ccal(files, concat = FALSE)
 }
 \arguments{
 \item{files}{Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.}

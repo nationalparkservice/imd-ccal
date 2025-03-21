@@ -36,5 +36,6 @@ URL: https://nationalparkservice.github.io/imd-ccal/
 Depends: 
     R (>= 3.5)
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 Config/testthat/edition: 3
