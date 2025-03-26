@@ -48,8 +48,16 @@
 <div class="page-header"><h1 id="imdccal">imdccal<a class="anchor" aria-label="anchor" href="#imdccal"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
-<p>The goal of imdccal is to extract data from <a href="https://ccal.oregonstate.edu/" class="external-link">CCAL</a> water chemistry lab deliverables, convert it to a machine readable format, and begin processing it into the EQuIS EDD format.</p>
+
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>imdccal is an R Package designed to help users work with water chemistry lab deliverables from the <a href="https://ccal.oregonstate.edu/" class="external-link">Cooperative Chemical Analytical Laboratory</a> (CCAL) at Oregon State University.</p>
+<p>Functions such as <code><a href="reference/read_ccal.html">read_ccal()</a></code> and <code><a href="reference/format_equis_results.html">format_equis_results()</a></code> help users extract data from .xlsx files provided by CCAL, convert them to a machine readable format, and begin processing them into the Environmental Quality Information Systems (EQuIS) Electronic Data Deliverable (EDD) format.</p>
+<p>The package is primarily geared towards data management in the Inventory &amp; Monitoring Division (IMD) of the National Park Service, but may be useful for other users of CCAL data.</p>
+<p>imdccal was developed by <a href="https://orcid.org/0009-0004-5060-2189" class="external-link">Sarah Wright</a> and <a href="https://orcid.org/0009-0003-2811-1044" class="external-link">Liam Smith</a> and is maintained by Sarah Wright. Please reach out via <a href="https://github.com/nationalparkservice/imd-ccal/issues" class="external-link">Issues</a> with any ideas for improvement.</p>
+<p><strong>Disclaimer:</strong> This package does its best to parse human-entered data. However, lab deliverables are known to vary across projects and over time. This package will never be able to predict every variation in the input data, although we will do our best to update it as we learn of new edge cases. As with any software, a knowledgeable human should ALWAYS verify that its outputs are correct and complete.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -74,45 +82,51 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nationalparkservice.github.io/imd-ccal/">imdccal</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create tidied CCAL data from demo data stored in the imdccal package</span></span>
-<span><span class="va">tidy_ccal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/getCCALData.html">getCCALData</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading data from</span></span>
-<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">data</span>     <span class="co"># Get the data for a single set of lab results</span></span>
-<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">metadata</span> <span class="co"># Get the metadata for the same set of results</span></span></code></pre></div>
+<span><span class="va">tidy_ccal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_ccal.html">read_ccal</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Get the data for a single set of lab results</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">data</span>     </span>
+<span><span class="co"># Get the metadata for the same set of results</span></span>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">tidy_ccal</span><span class="op">$</span><span class="va">`SPAC_080199.xlsx`</span><span class="op">$</span><span class="va">metadata</span> </span></code></pre></div>
 <p>Write the tidied data that is currently stored in the R environment to file. Note that destination_folder must already exist.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write data stored in environment to file</span></span>
-<span><span class="fu"><a href="reference/write_data.html">write_data</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">tidy_ccal</span>, </span>
+<span><span class="fu"><a href="reference/write_ccal.html">write_ccal</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">tidy_ccal</span>, </span>
 <span>           format <span class="op">=</span> <span class="st">"xlsx"</span>, <span class="co"># alternatively, "csv"</span></span>
 <span>           destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, <span class="co"># must already exist</span></span>
 <span>           overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>           suffix <span class="op">=</span> <span class="st">"_tidy"</span>,</span>
 <span>           num_tables <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p>Instead of the two step process of creating the tidied R object and writing it to file, users may use the <code><a href="reference/machineReadableCCAL.html">machineReadableCCAL()</a></code> function to create and write the tidied data to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the machine-readable version to an Excel file or set of CSV files.</p>
+<p>Instead of the two step process of creating the tidied R object and writing it to file, users may use the <code><a href="reference/read_write_ccal.html">read_write_ccal()</a></code> function to create and write the tidied data to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the machine-readable version to an Excel file or set of CSV files.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write tidied CCAL data to file from demo data stored in imdccal package</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
-<span>                    destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a new .xlsx</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>, </span>
-<span>                    format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write tidied data to a folder of CSV files</span></span></code></pre></div>
+<span></span>
+<span><span class="co"># Write tidied data to a new .xlsx</span></span>
+<span><span class="fu"><a href="reference/read_write_ccal.html">read_write_ccal</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span>                    destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="co"># Write tidied data to a folder of CSV files</span></span>
+<span><span class="fu"><a href="reference/read_write_ccal.html">read_write_ccal</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>, </span>
+<span>                    format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  </span></code></pre></div>
 <p>All of these functions also work when supplied with a vector of file paths to multiple CCAL deliverables. Here is an example of reading data from <em>multiple</em> files of CCAL lab data and writing the machine-readable version to an Excel files or sets of CSV files.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get file paths</span></span>
 <span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write to xlsx</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one file of tidied data per input file</span></span>
+<span><span class="co"># Write one file of tidied data per input file</span></span>
+<span><span class="fu"><a href="reference/read_write_ccal.html">read_write_ccal</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  </span>
 <span></span>
 <span><span class="co"># Write to csv</span></span>
-<span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  <span class="co"># Write one folder of tidied CSV data per input file</span></span></code></pre></div>
-<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/getCCALData.html">getCCALData()</a></code> or <code><a href="reference/machineReadableCCAL.html">machineReadableCCAL()</a></code> to TRUE.</p>
+<span><span class="co"># Write one folder of tidied CSV data per input file</span></span>
+<span><span class="fu"><a href="reference/read_write_ccal.html">read_write_ccal</a></span><span class="op">(</span><span class="va">all_files</span>, format <span class="op">=</span> <span class="st">"csv"</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span><span class="op">)</span>  </span></code></pre></div>
+<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/read_ccal.html">read_ccal()</a></code> or <code><a href="reference/read_write_ccal.html">read_write_ccal()</a></code> to TRUE.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/machineReadableCCAL.html">machineReadableCCAL</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, concat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/read_write_ccal.html">read_write_ccal</a></span><span class="op">(</span><span class="va">all_files</span>, destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, concat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example-creating-the-results-table-of-the-equis-edd">Example: Creating the Results Table of the EQuIS EDD<a class="anchor" aria-label="anchor" href="#example-creating-the-results-table-of-the-equis-edd"></a>
 </h2>
-<p>In addition to converting CCAL lab deliverables to a machine readable format, imdccal also provides functionality to begin processing the machine readable data into the EQuIS EDD format. Specifically, the <code><a href="reference/format_results.html">format_results()</a></code> function begins to format the data into the Results table for the EDD.</p>
+<p>In addition to converting CCAL lab deliverables to a machine readable format, imdccal also provides functionality to begin processing the machine readable data into the EQuIS EDD format. Specifically, the <code><a href="reference/format_equis_results.html">format_equis_results()</a></code> function begins to format the data into the Results table for the EDD.</p>
 <p><strong>Uses:</strong></p>
 <ul>
 <li>Process data into one of the tables in the format accepted by EQuIS</li>
@@ -127,43 +141,43 @@
 <p>Here we demonstrate the useage of this function. Read the data, create the Results table of the EDD, and work with it in R without writing the data to any files:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create results table from demo data stored in the imdccal package</span></span>
-<span><span class="va">results_incomplete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_results.html">format_results</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading data from</span></span>
-<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span></code></pre></div>
+<span><span class="va">results_incomplete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_equis_results.html">format_equis_results</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>If you inspect the table created above, you will notice that there are so many columns without data that the result is not useful. That’s because our code relies on a table containing detection limits for each analyte. To accommodate changes to detection limits over time, the table includes StartDate and EndDate columns. The issue we have above is that none of the limits are applicable after December 31, 2024, and our example data is from 2099.</p>
-<p>By default, <code><a href="reference/format_results.html">format_results()</a></code> uses the version of the table that is stored within the package. However, users may provide their own version of the table as an argument in the function if that better suits their needs. This may occur, for example, if detection limits change or if a user needs to include an analyte that is not yet in the table. To provide a different version of the table, start with the version stored in the package, and add rows or edit columns as you see fit. It may be helpful to review the documentation of the limits table (run <code><a href="reference/limits.html">?imdccal::limits</a></code>) as you make your edits. For example, we edit the EndDate for all relevant rows to December 31, 2099 in the code below.</p>
+<p>By default, <code><a href="reference/format_equis_results.html">format_equis_results()</a></code> uses the version of the table that is stored within the package. However, users may provide their own version of the table as an argument in the function if that better suits their needs. This may occur, for example, if detection limits change or if a user needs to include an analyte that is not yet in the table. To provide a different version of the table, start with the version stored in the package, and add rows or edit columns as you see fit. It may be helpful to review the documentation of the limits table (run <code><a href="reference/detection_limits.html">?imdccal::detection_limits</a></code>) as you make your edits. For example, we edit the EndDate for all relevant rows to December 31, 2099 in the code below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Edit limits table</span></span>
-<span><span class="va">limits</span> <span class="op">&lt;-</span> <span class="fu">imdccal</span><span class="fu">::</span><span class="va"><a href="reference/limits.html">limits</a></span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>EndDate <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">EndDate</span> <span class="op">==</span> <span class="st">"2024-12-31"</span>, <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2099-12-31"</span><span class="op">)</span>, <span class="va">EndDate</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Users may also save the table to a csv or xlsx file and make changes directly to a spreadsheet. To use one’s updated table in <code><a href="reference/format_results.html">format_results()</a></code>, simply supply the function with the modified table (as an R object) as the limits argument. We do so with our example data below.</p>
+<span><span class="va">limits</span> <span class="op">&lt;-</span> <span class="fu">imdccal</span><span class="fu">::</span><span class="va"><a href="reference/detection_limits.html">detection_limits</a></span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>EndDate <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">EndDate</span> <span class="op">==</span> <span class="st">"2024-12-31"</span>, </span>
+<span>                                         <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2099-12-31"</span><span class="op">)</span>, </span>
+<span>                                         <span class="va">EndDate</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Users may also save the table to a csv or xlsx file and make changes directly to a spreadsheet. To use one’s updated table in <code><a href="reference/format_equis_results.html">format_equis_results()</a></code>, simply supply the function with the modified table (as an R object) as the limits argument. We do so with our example data below.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create results table from demo data stored in the imdccal package</span></span>
-<span><span class="va">results_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_results.html">format_results</a></span><span class="op">(</span><span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
-<span>                                   limits <span class="op">=</span> <span class="va">limits</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading data from</span></span>
-<span><span class="co">#&gt; C:/Users/lsmith/AppData/Local/Temp/1/Rtmpg5B6bj/temp_libpathc…</span></span></code></pre></div>
-<p>Users may also provide their own version of the qualifiers table, which contains the lookup_code and remark columns from <a href="https://doimspp.sharepoint.com/:x:/r/sites/nps-nrss-wrdiv/_layouts/15/Doc.aspx?sourcedoc=%7B897FC8B3-2F68-4353-BB79-C0FEE9C45991%7D&amp;file=NPS_EQuIS_WQX_Reference_Values.xlsx&amp;action=default&amp;mobileredirect=true" class="external-link">NPS_EQuIS_WQX_Reference_Values</a> after filtering for rows where the #lookup_type is “Result_Qualifier”. In this package the only flag we raise is “J-R”, so unless this flag’s description changes, the user has no need to use this argument. However, it is worth familiarizing oneself with the table as it is useful for further data processing. Run <code><a href="reference/qualifiers.html">?imdccal::qualifiers</a></code> to see the table’s documentation. In addition, users may benefit from reading through the <a href="https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&amp;sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&amp;ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&amp;OR=Teams-HL&amp;CT=1719255259520&amp;clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" class="external-link">NPS EQuIS Resources website</a>, which provides comprehensive guidelines on formatting data for EQuIS.</p>
-<p>Like with the machine readable data, we can write the results table from our R environment to file with the <code><a href="reference/write_data.html">write_data()</a></code> function.</p>
+<span><span class="va">results_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_equis_results.html">format_equis_results</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span>  limits <span class="op">=</span> <span class="va">limits</span><span class="op">)</span></span></code></pre></div>
+<p>Users may also provide their own version of the qualifiers table, which contains the lookup_code and remark columns from <a href="https://doimspp.sharepoint.com/:x:/r/sites/nps-nrss-wrdiv/_layouts/15/Doc.aspx?sourcedoc=%7B897FC8B3-2F68-4353-BB79-C0FEE9C45991%7D&amp;file=NPS_EQuIS_WQX_Reference_Values.xlsx&amp;action=default&amp;mobileredirect=true" class="external-link">NPS_EQuIS_WQX_Reference_Values</a> after filtering for rows where the #lookup_type is “Result_Qualifier”. In this package the only flag we raise is “J-R”, so unless this flag’s description changes, the user has no need to use this argument. However, it is worth familiarizing oneself with the table as it is useful for further data processing. Run <code><a href="reference/equis_qualifiers.html">?imdccal::equis_qualifiers</a></code> to see the table’s documentation. In addition, users may benefit from reading through the <a href="https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&amp;sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&amp;ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&amp;OR=Teams-HL&amp;CT=1719255259520&amp;clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D" class="external-link">NPS EQuIS Resources website</a>, which provides comprehensive guidelines on formatting data for EQuIS.</p>
+<p>Like with the machine readable data, we can write the results table from our R environment to file with the <code><a href="reference/write_ccal.html">write_ccal()</a></code> function.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write data stored in environment to file</span></span>
-<span><span class="fu"><a href="reference/write_data.html">write_data</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">results_complete</span>, </span>
+<span><span class="fu"><a href="reference/write_ccal.html">write_ccal</a></span><span class="op">(</span>all_data <span class="op">=</span> <span class="va">results_complete</span>, </span>
 <span>           format <span class="op">=</span> <span class="st">"xlsx"</span>, <span class="co"># alternatively, "csv"</span></span>
 <span>           destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>, <span class="co"># must already exist</span></span>
 <span>           overwrite <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>           suffix <span class="op">=</span> <span class="st">"_edd_results"</span>, </span>
 <span>           num_tables <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>Also in the same manner as the machine readable data, instead of a two step process of creating the results table R object and writing it to file, users may use the <code><a href="reference/write_results.html">write_results()</a></code> function to create and write the results table to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the results table to an Excel or CSV file.</p>
+<p>Also in the same manner as the machine readable data, instead of a two step process of creating the results table R object and writing it to file, users may use the <code><a href="reference/write_equis_results.html">write_equis_results()</a></code> function to create and write the results table to file in one step. Here is an example of reading data from a single file of CCAL lab data and writing the results table to an Excel or CSV file.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write results table to xlsx from demo data stored in imdccal package</span></span>
-<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="reference/write_equis_results.html">write_equis_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_080199.xlsx"</span><span class="op">)</span>,</span>
 <span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
 <span>              format <span class="op">=</span> <span class="st">"xlsx"</span>,</span>
 <span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
 <span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write results table to csv from demo data stored in imdccal package</span></span>
-<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>,</span>
+<span><span class="fu"><a href="reference/write_equis_results.html">write_equis_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="st">"SPAC_081599.xlsx"</span><span class="op">)</span>,</span>
 <span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
 <span>              format <span class="op">=</span> <span class="st">"csv"</span>,</span>
 <span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
@@ -174,20 +188,20 @@
 <span><span class="va">all_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span>file_names <span class="op">=</span> <span class="fu"><a href="reference/use_example_data.html">use_example_data</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write to xlsx</span></span>
-<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<span><span class="fu"><a href="reference/write_equis_results.html">write_equis_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
 <span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
 <span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
 <span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write to csv</span></span>
-<span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<span><span class="fu"><a href="reference/write_equis_results.html">write_equis_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
 <span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
 <span>              format <span class="op">=</span> <span class="st">"csv"</span>, </span>
 <span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
 <span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/format_results.html">format_results()</a></code> or <code><a href="reference/write_results.html">write_results()</a></code> to TRUE.</p>
+<p>By default, these functions create separate tables and files for each CCAL deliverable supplied as input. To concatenate the results together, set the <code>concat</code> argument in <code><a href="reference/format_equis_results.html">format_equis_results()</a></code> or <code><a href="reference/write_equis_results.html">write_equis_results()</a></code> to TRUE.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/write_results.html">write_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/write_equis_results.html">write_equis_results</a></span><span class="op">(</span>files <span class="op">=</span> <span class="va">all_files</span>, </span>
 <span>              limits <span class="op">=</span> <span class="va">limits</span>,</span>
 <span>              destination_folder <span class="op">=</span> <span class="st">"ccal_tidy"</span>,</span>
 <span>              overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -217,7 +231,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/nationalparkservice/imd-ccal/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/nationalparkservice/imd-ccal/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
