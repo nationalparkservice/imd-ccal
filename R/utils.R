@@ -22,21 +22,22 @@ tryParseDate <- function(date_chr, try_fns = list(lubridate::mdy_hms, lubridate:
 
 #' Expand Number Range in Text to All Numbers in Range
 #'
-#' Takes a character vector containing a number range (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
+#' Takes a character vector containing a range of numeric IDs (e.g. "11 - 14") and replaces the range with the numbers contained in the range ("11 12 13 14").
+#' @details
+#' Does NOT work with negative numbers.
 #'
-#' @param numbers Character vector containing a number range indicated by a dash (e.g. "123 - 456")
-#' @param separator Character string to use as a separator between numbers
+#'
+#' @param numbers Character vector containing a number range indicated by a dash (e.g. "123 - 456"). Numbers outside of range must be separated by whitespace (e.g. "1 3 5-9"). Number range can be ascending or descending but cannot contain negative numbers. "-123 - 456" is NOT valid input. No non-numeric characters are permitted, except for whitespace and dashes.
+#' @param separator Character string to use as a separator between numbers in output.
 #'
 #' @return The same character vector, but with number ranges removed and replaced with the numbers in the range explicitly listed.
-#' @export
 #'
-#' @examples
-#' rangeToVector("1 3 5-8 10")
-rangeToVector <- Vectorize(function(numbers, separator = " ") {
+range_to_vector <- Vectorize(function(numbers, separator = " ") {
   if (is.na(numbers) || length(numbers) == 0) {
     return(NA)
   }
-  ranges <- unlist(stringr::str_extract_all(numbers, "\\d+\\s*(–|-)\\s*\\d+"))
+  numbers <- stringr::str_replace_all(numbers, "\\s+", " ")  # replace all whitespace with single space
+  ranges <- unlist(stringr::str_extract_all(numbers, "\\d+\\s*(\u2013|\u2D)\\s*\\d+"))  #\u2D and \u2013 are unicode dashes
   sapply(ranges, function(range) {
     start <- stringr::str_extract(range, "^\\d+")
     end <- stringr::str_extract(range, "\\d+$")
@@ -44,13 +45,17 @@ rangeToVector <- Vectorize(function(numbers, separator = " ") {
     numbers <<- stringr::str_replace(numbers, range, seq)
   })
 
+  # Check for non-numeric characters in final result and throw error if found
+  if (grepl(pattern = "[^\\d|\\s]", numbers, perl = TRUE)) {
+    cli::cli_abort("Numeric IDs are improperly formatted. Special characters (except for a dash indicating a numeric range) are not supported, nor are negative IDs.")
+  }
+
   return(numbers)
 }, USE.NAMES = FALSE)
 
-
 #' List every parameter that occurs in the data
 #'
-#' @param ccal_data The list object returned by `getCCALData`
+#' @param ccal_data The list object returned by `read_ccal`
 #'
 #' @return A character vector of parameter codes
 #' @export
@@ -58,9 +63,9 @@ rangeToVector <- Vectorize(function(numbers, separator = " ") {
 #' @examples
 #' my_folder <- "ccal_results"
 #' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#' parameters <- listParamsInData(all_ccal_data)
-listParamsInData <- function(ccal_data) {
+#' all_ccal_data <- read_ccal(file_list)
+#' parameters <- get_data_params(all_ccal_data)
+get_data_params <- function(ccal_data) {
   unique(
     unlist(
       lapply(ccal_data, function(l) {
@@ -74,7 +79,7 @@ listParamsInData <- function(ccal_data) {
 
 #' List every parameter name that occurs in the questionable results
 #'
-#' @param ccal_data The list object returned by `getCCALData`
+#' @param ccal_data The list object returned by `read_ccal`
 #'
 #' @return A character vector of parameter names
 #' @export
@@ -82,9 +87,9 @@ listParamsInData <- function(ccal_data) {
 #' @examples
 #' my_folder <- "ccal_results"
 #' file_list <- list.files(my_folder, pattern = "*.xlsx$", full.names = TRUE)
-#' all_ccal_data <- getCCALData(file_list)
-#' param_names <- listParamsInQuestionableResults(all_ccal_data)
-listParamsInQuestionableResults <- function(ccal_data) {
+#' all_ccal_data <- read_ccal(file_list)
+#' param_names <- get_questionable_params(all_ccal_data)
+get_questionable_params <- function(ccal_data) {
   unique(
     unlist(
       lapply(ccal_data, function(l) {
@@ -98,7 +103,7 @@ listParamsInQuestionableResults <- function(ccal_data) {
 
 #' List the file name(s) or file paths of imdccal's example data
 #'
-#' @param file_names
+#' @param file_names Optional. File name of requested example data. For a list of available example data files, omit this argument.
 #'
 #' @returns If file_names is supplied, `use_example_data()` returns the full file path to the requested package data.
 #' Otherwise, it returns the file names of example data.

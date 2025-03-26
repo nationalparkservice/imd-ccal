@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples
-#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
-getCCALData <- function(files, concat = FALSE) {
+#' tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
+read_ccal <- function(files, concat = FALSE) {
   data <- purrr::map(files, function(file) {
 
     cli::cli_progress_message("Reading data from {file}...")
@@ -85,7 +85,7 @@ getCCALData <- function(files, concat = FALSE) {
                     orig_text = character) %>%
       dplyr::select(-character)
 
-    quest_results$lab_number <- rangeToVector(quest_results$lab_number)
+    quest_results$lab_number <- range_to_vector(quest_results$lab_number)
     quest_results <- tidyr::separate_longer_delim(quest_results, lab_number, delim = " ")
 
     # Create data frame for metadata
@@ -104,6 +104,23 @@ getCCALData <- function(files, concat = FALSE) {
     questionable <- dplyr::filter(quest_results, !(is.na(lab_number) | is.null(lab_number))) %>%
       dplyr::mutate(parameter = getParamCrosswalk(param_description))
 
+    # Handle duplicates in questionable results
+    questionable_dups <- questionable %>%
+      dplyr::group_by(lab_number, parameter) %>%
+      dplyr::summarise(dups = dplyr::n()) %>%
+      dplyr::filter(dups > 1)
+    dups_present <- nrow(questionable_dups) > 0
+
+    if (dups_present) {
+      dup_samples <- paste(questionable_dups$lab_number, questionable_dups$parameter, sep = ": ")
+      warning <- c("!" = "Questionable results contain duplicate rows:",
+                   "!" = "See samples: {dup_samples}.",
+                   "i" = "This may be caused by lab error, or may be a result of one analyte being compared to more than one other analyte.",
+                   "i" = "See the {.envvar questionable} table returned by this function.")
+
+      cli::cli_warn(warning)
+    }
+
     # Get additional questionable results comments that aren't tied to specific sample numbers and put them in the metadata
     extra_comments <- dplyr::filter(quest_results, is.na(lab_number) | is.null(lab_number))
     extra_comments <- paste(extra_comments$orig_text, collapse = "; ")
@@ -115,11 +132,11 @@ getCCALData <- function(files, concat = FALSE) {
     last_date_col <- max(grep("^date(\\.\\.\\.\\d+){0,1}$", names(data), ignore.case = TRUE))
     names(data) <- trimws(names(data))
     data <- data %>%
-      tidyr::pivot_longer(first_chem_col:last_date_col, names_to = "param") %>%
+      tidyr::pivot_longer(dplyr::all_of(first_chem_col:last_date_col), names_to = "param") %>%
       tidyr::separate(param, c("parameter", "unit"), sep = "\\(", fill = "right") %>%
       dplyr::mutate(parameter = stringr::str_replace(parameter, "\\.\\.\\.\\d+", ""),
                     date = dplyr::lead(value)) %>%
-      dplyr::filter(!grepl("date", parameter, ignore.case= TRUE)) %>%
+      dplyr::filter(!grepl("date", parameter, ignore.case = TRUE)) %>%
       dplyr::mutate(repeat_measurement = stringr::str_extract(parameter, "^.*icate "),
                     flag_symbol = stringr::str_remove_all(value, "[\\d\\.]"),
                     parameter = ifelse(is.na(repeat_measurement), parameter, stringr::str_remove(parameter, repeat_measurement)),
@@ -129,11 +146,19 @@ getCCALData <- function(files, concat = FALSE) {
                     unit = stringr::str_remove(unit, "\\)"),
                     repeat_measurement = stringr::str_to_lower(trimws(repeat_measurement))) %>%
       dplyr::filter(!is.na(value)) %>%
-      janitor::clean_names() %>%
-      dplyr::left_join(questionable, by = c("parameter", "lab_number")) %>%
-      dplyr::select(-param_description, -comparison, -assessment) %>%
-      dplyr::rename(qa_within_precision_limits = within_precision_limits,
-                    qa_description = orig_text)
+      janitor::clean_names()
+
+      ## Code commented out below allows qa columns to be added if no duplicate questionable results are present
+      ## HOWEVER, it doesn't work when concat == TRUE if qa columns are omitted from some results but not others
+      ## May be worth handling this logic in the future if it's requested, but otherwise it's simpler to let people do the joins on their own
+      # if (try_qa_join && !dups_present) {
+      #   data <- data %>%
+      #     dplyr::left_join(questionable, by = c("parameter", "lab_number")) %>%
+      #     dplyr::select(-param_description, -comparison, -assessment) %>%
+      #     dplyr::rename(qa_within_precision_limits = within_precision_limits,
+      #                   qa_description = orig_text)
+      # }
+
 
     # Trim whitespace, replace empty strings with NA, and attempt to parse dates and times
     metadata <- dplyr::mutate(metadata,
@@ -191,7 +216,7 @@ getCCALData <- function(files, concat = FALSE) {
 #'
 #' Takes data as delivered by CCAL, extracts it, and rewrites it to tabs in an xlsx file or csv files in a folder.
 #'
-#' @inheritParams getCCALData
+#' @inheritParams read_ccal
 #' @param concat If concat is set to TRUE, the function creates one file, rather than one file for every CCAL deliverable.
 #' By default, concat is set to FALSE, so the function creates separate files for every CCAL deliverable.
 #' If only one file path is supplied to the files argument, this parameter does not affect the output.
@@ -208,20 +233,22 @@ getCCALData <- function(files, concat = FALSE) {
 #' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
-#' machineReadableCCAL(all_files, destination_folder = "ccal_tidy")  # Write one file of tidied data per input file
+#' # Writes one file of tidied data per input file
+#' read_write_ccal(all_files, destination_folder = "ccal_tidy")
 #'
 #' # Write to csv
-#' machineReadableCCAL(all_files, format = "csv", destination_folder = "ccal_tidy")  # Write one folder of tidied CSV data per input file
+#' # Writes one folder of tidied CSV data per input file
+#' read_write_ccal(all_files, format = "csv", destination_folder = "ccal_tidy")
 #'
 #' }
-machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
+read_write_ccal <- function(files, format = c("xlsx", "csv"), destination_folder = "./",
                                 overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- getCCALData(files, concat)  # Read in data
+  all_data <- read_ccal(files, concat)  # Read in data
 
-  write_data(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
+  write_ccal(all_data, format, destination_folder, overwrite, suffix = "_tidy", num_tables = 4)
 
   return(invisible(all_data))
 }
@@ -240,17 +267,17 @@ machineReadableCCAL <- function(files, format = c("xlsx", "csv"), destination_fo
 #' @examples
 #' \dontrun{
 #' # Create tidied CCAL data from demo data stored in the imdccal package
-#' tidy_ccal <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))
+#' tidy_ccal <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))
 #'
 #' # Write data stored in environment to file
-#' write_data(all_data = tidy_ccal,
+#' write_ccal(all_data = tidy_ccal,
 #'           format = "xlsx", # alternatively, "csv"
 #'           destination_folder = "ccal_tidy", # must already exist
 #'           overwrite = TRUE,
 #'           suffix = "_tidy",
 #'           num_tables = 4)
 #' }
-write_data <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
+write_ccal <- function(all_data, format = c("xlsx", "csv"), destination_folder, overwrite, suffix, num_tables) {
 
   format <- match.arg(format)
 

@@ -4,10 +4,10 @@
 \alias{assign_detection_flags}
 \title{Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.}
 \usage{
-assign_detection_flags(data, limits = imdccal::limits)
+assign_detection_flags(data, limits = imdccal::detection_limits)
 }
 \arguments{
-\item{data}{The "data" table produced by getCCALData() after duplicates have been removed with handle_duplicates().}
+\item{data}{The "data" table produced by read_ccal() after duplicates have been removed with remove_ccal_duplicates().}
 
 \item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
 }
@@ -20,7 +20,7 @@ Any other flags will need to be defined separately by the user.
 Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
 }
 \examples{
-tidy_ccal_flagged <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] \%>\%
-  handle_duplicates() \%>\%
+tidy_ccal_flagged <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] \%>\%
+  remove_ccal_duplicates() \%>\%
   assign_detection_flags()
 }

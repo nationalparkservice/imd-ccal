@@ -1,32 +1,25 @@
-#' Remove lab duplicates and other duplicate rows.
+#' Remove lab duplicates.
 #'
-#' @param data The "data" table produced by getCCALData().
+#' @param data The "data" table produced by read_ccal().
 #'
-#' @return The data after lab QC duplicates have been removed and any duplicate rows resulting from the presence of multiple flags for one measurement have been removed.
+#' @return The data after lab QC duplicates have been removed.
 #' @export
 #'
 #' @examples
-#' tidy_ccal_no_dups <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
-#'   handle_duplicates()
-handle_duplicates <- function(data) {
+#' tidy_ccal_no_dups <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
+#'   remove_ccal_duplicates()
+remove_ccal_duplicates <- function(data) {
 
   # Drop lab duplicates
   data <- data %>%
     dplyr::filter(is.na(repeat_measurement))
-
-  # Concatenate duplicated rows due to different qa flags from CCAL
-  data <- data %>%
-    dplyr::group_by(dplyr::across(-c(qa_description, qa_within_precision_limits))) %>%
-    dplyr::summarise(qa_description = paste(qa_description, collapse = "... ")) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(qa_description = dplyr::if_else(qa_description == "NA", NA, qa_description)) # fix NA issue
 
   return(data)
 }
 
 #' Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
 #'
-#' @param data The "data" table produced by getCCALData() after duplicates have been removed with handle_duplicates().
+#' @param data The "data" table produced by read_ccal() after duplicates have been removed with remove_ccal_duplicates().
 #' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
 #'
 #' @return The input data with the addition of a new flag field.
@@ -35,10 +28,10 @@ handle_duplicates <- function(data) {
 #' @export
 #'
 #' @examples
-#' tidy_ccal_flagged <- getCCALData(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
-#'   handle_duplicates() %>%
+#' tidy_ccal_flagged <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
+#'   remove_ccal_duplicates() %>%
 #'   assign_detection_flags()
-assign_detection_flags <- function(data, limits = imdccal::limits) {
+assign_detection_flags <- function(data, limits = imdccal::detection_limits) {
   data <- data %>%
     dplyr::left_join(limits %>% dplyr::select(analyte_code, Method_Detection_Limit, Lower_Quantification_Limit, StartDate, EndDate), # join MDL and ML to data
                      by = dplyr::join_by(parameter == analyte_code,
@@ -70,19 +63,21 @@ assign_detection_flags <- function(data, limits = imdccal::limits) {
 #'
 #' @examples
 #' # Edit limits table to work with example data
-#' limits <- imdccal::limits |>
-#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#' limits <- imdccal::detection_limits |>
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31",
+#'                                          lubridate::ymd("2099-12-31"),
+#'                                          EndDate))
 #'
 #' # Create results table
-#' results <- format_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
+#' results <- format_equis_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
 #'                           limits = limits)
-format_results <- function(file_paths, limits = imdccal::limits,
-                           qualifiers = imdccal::qualifiers, concat = FALSE){
+format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
+                           qualifiers = imdccal::equis_qualifiers, concat = FALSE){
 
-  edd_results <- getCCALData(file_paths, concat) %>%
+  edd_results <- read_ccal(file_paths, concat) %>%
     lapply(function(x) {
     x[[1]] %>% # process CCAL data with function from original package
-      handle_duplicates() %>% # remove duplicates
+      remove_ccal_duplicates() %>% # remove duplicates
       assign_detection_flags(limits) %>% # assign J-R flag
       dplyr::left_join(limits %>% dplyr::select(-analysis), # join data about detection limits
                          by = dplyr::join_by(parameter == analyte_code,
@@ -238,33 +233,35 @@ format_results <- function(file_paths, limits = imdccal::limits,
 #' @examples
 #' \dontrun{
 #' # Edit limits table to work with example data
-#' limits <- imdccal::limits |>
-#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
+#' limits <- imdccal::detection_limits |>
+#'   dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31",
+#'                                          lubridate::ymd("2099-12-31"),
+#'                                          EndDate))
 #'
 #' # Get file paths
 #' all_files <- use_example_data(file_names = use_example_data())
 #'
 #' # Write to xlsx
-#' write_results(files = all_files,
+#' write_equis_results(files = all_files,
 #'               limits = limits,
 #'               destination_folder = "ccal_tidy",
 #'               overwrite = TRUE)  # Write one file of tidied data per input file
 #'
 #' # Write to csv
-#' write_results(files = all_files,
+#' write_equis_results(files = all_files,
 #'               limits = limits,
 #'               format = "csv",
 #'               destination_folder = "ccal_tidy",
 #'               overwrite = TRUE)  # Write one folder of tidied CSV data per input file
 #' }
-write_results <- function(files, limits = imdccal::limits, qualifiers = imdccal::qualifiers, format = c("xlsx", "csv"),
+write_equis_results <- function(files, limits = imdccal::detection_limits, qualifiers = imdccal::equis_qualifiers, format = c("xlsx", "csv"),
                           destination_folder = "./", overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- format_results(files, limits, qualifiers, concat)  # Read in data
+  all_data <- format_equis_results(files, limits, qualifiers, concat)  # Read in data
 
-  write_data(all_data, format, destination_folder, overwrite, suffix = "_edd_results", num_tables = 1)
+  write_ccal(all_data, format, destination_folder, overwrite, suffix = "_edd_results", num_tables = 1)
 
   return(invisible(all_data))
 }
