@@ -1,7 +1,7 @@
 Package: imdccal
 Type: Package
 Title: Wrangle CCAL Data Into Machine Readable Format
-Version: 0.1.2
+Version: 1.0.0
 Authors@R: 
     c(person("Sarah", "Wright", , "sarah_wright@nps.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-5060-2189")),
