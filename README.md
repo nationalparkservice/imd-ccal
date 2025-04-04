@@ -36,8 +36,8 @@ any ideas for improvement.
 However, lab deliverables are known to vary across projects and over
 time. This package will never be able to predict every variation in the
 input data, although we will do our best to update it as we learn of new
-edge cases. As with any software, a knowledgeable human should ALWAYS
-verify that its outputs are correct and complete.
+edge cases. As is the case with any software tool, a knowledgeable human
+should ALWAYS verify that its outputs are correct and complete.
 
 ## Installation
 
@@ -149,9 +149,8 @@ Results table for the EDD.
 **Uses:**
 
 - Process data into one of the tables in the format accepted by EQuIS
-- Censor values less than or equal to the MDL
-- Raise the J-R flag for observations greater than the MDL but less than
-  or equal to the LQL
+- Censor values less than the MDL and LQL and assign
+  Result_Detection_Condition approriately
 
 **Limitations:**
 
@@ -159,11 +158,17 @@ Results table for the EDD.
   the Projects and Locations tables when they require edits.
 - Within the Results table, users still need to define Activity_ID,
   modify Result_Status (set to Pre-Cert since additional QC is needed),
-  add flags, and conduct the rest of their own QC processes
+  add flags to Result_Qualifier, and conduct the rest of their own QC
+  processes
 
-Here we demonstrate the useage of this function. Read the data, create
-the Results table of the EDD, and work with it in R without writing the
-data to any files:
+For further information regarding the EQuIS EDD, please refer to the
+[NPS EQuIS Resources
+website](https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&OR=Teams-HL&CT=1719255259520&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D),
+which provides comprehensive guidelines on formatting data for EQuIS.
+
+Here we demonstrate the usage of the `format_equis_results()` function.
+Read the data, create the Results table of the EDD, and work with it in
+R without writing the data to any files:
 
 ``` r
 # Create results table from demo data stored in the imdccal package
@@ -211,19 +216,6 @@ results_complete <- format_equis_results(
   use_example_data(file_names = "SPAC_080199.xlsx"),
   limits = limits)
 ```
-
-Users may also provide their own version of the qualifiers table, which
-contains the lookup_code and remark columns from
-[NPS_EQuIS_WQX_Reference_Values](https://doimspp.sharepoint.com/:x:/r/sites/nps-nrss-wrdiv/_layouts/15/Doc.aspx?sourcedoc=%7B897FC8B3-2F68-4353-BB79-C0FEE9C45991%7D&file=NPS_EQuIS_WQX_Reference_Values.xlsx&action=default&mobileredirect=true)
-after filtering for rows where the \#lookup_type is “Result_Qualifier”.
-In this package the only flag we raise is “J-R”, so unless this flag’s
-description changes, the user has no need to use this argument. However,
-it is worth familiarizing oneself with the table as it is useful for
-further data processing. Run `?imdccal::equis_qualifiers` to see the
-table’s documentation. In addition, users may benefit from reading
-through the [NPS EQuIS Resources
-website](https://doimspp.sharepoint.com/sites/nps-nrss-wrdiv/SitePages/DMEQuIS.aspx?xsdata=MDV8MDJ8fDE1NTcyM2EwNmEyODQ3NThhZDM5MDhkYzUzNDVjZjUwfDA2OTNiNWJhNGIxODRkN2I5MzQxZjMyZjQwMGE1NDk0fDB8MHw2Mzg0NzY4MDY0NzU3ODc1Nzd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZUbXBuTVU5RWF6UlBWR2QwV21wck5FMXBNREJPZWtreVRGUm9iRTFxWjNSYVZFWnBUMFJWTTAxNmJHaFBSRUpxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56RXlNRGd6T0RRMk1qVXd8MDU3NTdhODQyYWI2NDI5MGFkMzkwOGRjNTM0NWNmNTB8Yjg5ZDU1YmI3ZjVhNDNhNmJlODQwMzU5NDgyNTM1ZmM%3D&sdata=TjVsUVVHQS84VDQ2NUlRZmNzMlE3R2hRRWI0MDdlaVRIL0hkNnAxMmRSQT0%3D&ovuser=0693b5ba-4b18-4d7b-9341-f32f400a5494%2Cavolk%40nps.gov&OR=Teams-HL&CT=1719255259520&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA1MTYyMjIyMyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D),
-which provides comprehensive guidelines on formatting data for EQuIS.
 
 Like with the machine readable data, we can write the results table from
 our R environment to file with the `write_ccal()` function.

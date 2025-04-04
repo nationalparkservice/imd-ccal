@@ -17,48 +17,17 @@ remove_ccal_duplicates <- function(data) {
   return(data)
 }
 
-#' Assign quality control flags to values less than or equal to the minimum level of quantification but greater than the MDL.
-#'
-#' @param data The "data" table produced by read_ccal() after duplicates have been removed with remove_ccal_duplicates().
-#' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
-#'
-#' @return The input data with the addition of a new flag field.
-#' The only flag included in this routine is the J-R flag.
-#' Any other flags will need to be defined separately by the user.
-#' @export
-#'
-#' @examples
-#' tidy_ccal_flagged <- read_ccal(use_example_data(file_names = "SPAC_080199.xlsx"))[[1]][[1]] %>%
-#'   remove_ccal_duplicates() %>%
-#'   assign_detection_flags()
-assign_detection_flags <- function(data, limits = imdccal::detection_limits) {
-  data <- data %>%
-    dplyr::left_join(limits %>% dplyr::select(analyte_code, Method_Detection_Limit, Lower_Quantification_Limit, StartDate, EndDate), # join MDL and ML to data
-                     by = dplyr::join_by(parameter == analyte_code,
-                                         date >= StartDate,
-                                         date <= EndDate)) %>%
-    dplyr::mutate(flag = dplyr::case_when(
-      value %<=% Method_Detection_Limit ~ NA,
-      value %<=% Lower_Quantification_Limit ~ "J-R",
-      TRUE ~ NA
-    )) %>%
-    dplyr::select(-c(Method_Detection_Limit, Lower_Quantification_Limit, StartDate, EndDate)) # remove so that there are no unexpected side effects. User expects the addition of just the flag field.
-
-  return(data)
-}
-
 #' Create the results table of the EQuIS EDD.
 #'
 #' @param file_paths Path to .xlsx file delivered by CCAL.
 #' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
-#' @param qualifiers Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.
 #' @param concat If concat is set to TRUE, the output contains one table rather than one for every input file.
 #' By default, concat is set to FALSE, so the output contains separate tables for each file.
 #' If only one file path is supplied to the file_paths argument, this parameter does not affect the output.
 #'
 #' @return The data formatted for input into the EQuIS system as the "Results" table.
 #' Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
-#' For example, users must define Activity_ID, assign any additional flags, and modify Result_Status depending on the outcome of their quality control process.
+#' For example, users must define Activity_ID, assign any flags in Result_Qualifier, and modify Result_Status depending on the outcome of their quality control process.
 #' @export
 #'
 #' @examples
@@ -71,30 +40,34 @@ assign_detection_flags <- function(data, limits = imdccal::detection_limits) {
 #' # Create results table
 #' results <- format_equis_results(file_paths = use_example_data(file_names = "SPAC_080199.xlsx"),
 #'                           limits = limits)
-format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
-                           qualifiers = imdccal::equis_qualifiers, concat = FALSE){
+format_equis_results <- function(file_paths, limits = imdccal::detection_limits, concat = FALSE){
 
   edd_results <- read_ccal(file_paths, concat) %>%
     lapply(function(x) {
     x[[1]] %>% # process CCAL data with function from original package
       remove_ccal_duplicates() %>% # remove duplicates
-      assign_detection_flags(limits) %>% # assign J-R flag
       dplyr::left_join(limits %>% dplyr::select(-analysis), # join data about detection limits
                          by = dplyr::join_by(parameter == analyte_code,
                                              date >= StartDate,
                                              date <= EndDate)) %>%
       dplyr::rename("#Org_Code" = "project_code") %>%
       dplyr::mutate(Activity_ID = NA,
-             Result_Detection_Condition = dplyr::if_else(value %<=% Method_Detection_Limit,
-                                                         "Not Detected", "Detected And Quantified"),
-             Result_Type = dplyr::if_else(flag == "J-R", "Estimated", "Actual", missing = "Actual"),
+             Result_Detection_Condition = dplyr::case_when(value %<<% Method_Detection_Limit
+                                                            ~ "Not Detected",
+                                                           value %<<% Lower_Quantification_Limit
+                                                            ~ "Present Below Quantification Limit",
+                                                           TRUE ~ "Detected And Quantified"),
+             Result_Comment = dplyr::case_when(value %<<% Method_Detection_Limit
+                                                ~ paste0("Lab reported a value of ", value, " which was below the MDL"),
+                                               value %<<% Lower_Quantification_Limit
+                                                ~ paste0("Lab reported a value of ", value, " which was below the LQL"),
+                                               TRUE ~ NA),
              Result_Text = dplyr::if_else(Result_Detection_Condition == "Detected And Quantified", value, NA),
-             Reportable_Result = NA) %>%
-      dplyr::left_join(qualifiers %>% dplyr::rename("Result_Comment" = "remark"),
-                       by = c("flag" = "lookup_code")) %>%
-      dplyr::rename("Result_Qualifier" = "flag") %>%
-      dplyr::mutate(Result_Status = "Pre-Cert") %>%
-      dplyr::mutate(Upper_Quantification_Limit = NA,
+             Result_Type = "Actual",
+             Reportable_Result = NA,
+             Result_Qualifier = NA,
+             Result_Status = "Pre-Cert",
+             Upper_Quantification_Limit = NA,
              Limit_Comment = "Detection Limit Type = MDL",
              Temperature_Basis = NA,
              Statistical_Basis = NA,
@@ -171,10 +144,6 @@ format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
              Result_File_Name = NA,
              Lab_Reported_Result = value,
              Source_Flags = {if("comment" %in% names(.)) comment else NA},
-             # Source_Flags = paste(comment, flag_symbol, qa_description, sep = "... "),
-             # Source_Flags = str_replace_all(Source_Flags, "NA... ", ""),
-             # Source_Flags = str_replace_all(Source_Flags, "... NA", ""),
-             # Source_Flags = if_else(Source_Flags == "NA", NA, Source_Flags),
              Logger_Standard_Difference = NA,
              Logger_Percent_Error = NA,
              Analytical_Method_ID_Context = NA,
@@ -219,7 +188,6 @@ format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
 #'
 #' @param files Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.
 #' @param limits Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.
-#' @param qualifiers Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.
 #' @inheritParams openxlsx::write.xlsx
 #' @param format File format to export machine readable data to - either "xlsx" or "csv"
 #' @param destination_folder Folder to save the data in. Defaults to current working directory. Folder must already exist.
@@ -254,12 +222,12 @@ format_equis_results <- function(file_paths, limits = imdccal::detection_limits,
 #'               destination_folder = "ccal_tidy",
 #'               overwrite = TRUE)  # Write one folder of tidied CSV data per input file
 #' }
-write_equis_results <- function(files, limits = imdccal::detection_limits, qualifiers = imdccal::equis_qualifiers, format = c("xlsx", "csv"),
+write_equis_results <- function(files, limits = imdccal::detection_limits, format = c("xlsx", "csv"),
                           destination_folder = "./", overwrite = FALSE, concat = FALSE) {
   format <- match.arg(format)
   destination_folder <- normalizePath(destination_folder, winslash = .Platform$file.sep)
 
-  all_data <- format_equis_results(files, limits, qualifiers, concat)  # Read in data
+  all_data <- format_equis_results(files, limits, concat)  # Read in data
 
   write_ccal(all_data, format, destination_folder, overwrite, suffix = "_edd_results", num_tables = 1)
 

@@ -13,32 +13,6 @@ test_that("Lab duplicates are removed with remove_ccal_duplicates()", {
                0)
 })
 
-test_that("J-R flags are assigned correctly with assign_detection_flags()", {
-  # Edit limits table
-  detection_limits <- detection_limits |>
-    dplyr::mutate(EndDate = dplyr::if_else(EndDate == "2024-12-31", lubridate::ymd("2099-12-31"), EndDate))
-
-  # Create data without duplicates and with detection flags
-  data <- suppressMessages(read_ccal(use_example_data("SPAC_081599.xlsx")))[[1]]$data |>
-    remove_ccal_duplicates() |>
-    assign_detection_flags(detection_limits)
-
-  # Determine the row numbers of J-R flags
-  flag_indices <- data |>
-    dplyr::mutate(row_num = dplyr::row_number()) |>
-    dplyr::filter(flag == "J-R") |>
-    dplyr::pull(row_num)
-
-  # Check that J-R flags occur where expected
-  expect_equal(flag_indices,
-               c(4, 20, 21, 27, 32, 46, 60, 62, 70, 75, 76, 88, 90, 92, 94,
-                 102, 104, 107, 116, 118, 132, 134, 144, 146, 149, 150, 160,
-                 164, 172, 174, 178, 186, 188, 200, 202, 206, 214, 216, 218,
-                 230, 234, 242, 244, 245, 256, 258, 270, 272, 286, 288, 289,
-                 300, 314, 317, 318, 328, 331, 332, 336, 342, 354, 356, 357,
-                 382, 396, 410, 411, 412))
-})
-
 test_that("Results table is formatted correctly by format_equis_results()", {
   # Edit limits table
   detection_limits <- detection_limits |>
@@ -88,4 +62,35 @@ test_that("Results table is formatted correctly by format_equis_results()", {
                "Result_File_Name", "Lab_Reported_Result", "Reportable_Result", "Source_Flags",
                "Logger_Standard_Difference", "Logger_Percent_Error", "Analytical_Method_ID_Context",
                "Predicted_Result"))
+
+  # Check the formatting when results are less than the MDL
+  expect_equal(
+    results[[1]] |>
+      dplyr::filter(Lab_Reported_Result %<<% Method_Detection_Limit) |> # only look at results less than MDL
+      dplyr::filter(Result_Detection_Condition != "Not Detected" |
+                    is.na(Result_Comment) |
+                      !is.na(Result_Text)) |>
+      nrow(),
+    0)
+
+  # Check the formatting when results are at least the MDL but less than the LQL
+  expect_equal(
+    results[[1]] |>
+      dplyr::filter(!Lab_Reported_Result %<<% Method_Detection_Limit) |> # remove results less than MDL
+      dplyr::filter(Lab_Reported_Result %<<% Lower_Quantification_Limit) |> # only look at results less than LQL
+      dplyr::filter(Result_Detection_Condition != "Present Below Quantification Limit" |
+                      is.na(Result_Comment) |
+                      !is.na(Result_Text)) |>
+      nrow(),
+    0)
+
+  # Check the formatting when results are at least the LQL
+  expect_equal(
+    results[[1]] |>
+      dplyr::filter(!Lab_Reported_Result %<<% Lower_Quantification_Limit) |> # only look at results at least the LQL
+      dplyr::filter(Result_Detection_Condition != "Detected And Quantified" |
+                      !is.na(Result_Comment) |
+                      is.na(Result_Text)) |>
+      nrow(),
+    0)
 })
