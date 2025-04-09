@@ -68,7 +68,7 @@ test_that("Results table is formatted correctly by format_equis_results()", {
     results[[1]] |>
       dplyr::filter(Lab_Reported_Result %<<% Method_Detection_Limit) |> # only look at results less than MDL
       dplyr::filter(Result_Detection_Condition != "Not Detected" |
-                    is.na(Result_Comment) |
+                    !stringr::str_detect(Result_Comment, "Lab reported a value of") |
                       !is.na(Result_Text)) |>
       nrow(),
     0)
@@ -79,7 +79,7 @@ test_that("Results table is formatted correctly by format_equis_results()", {
       dplyr::filter(!Lab_Reported_Result %<<% Method_Detection_Limit) |> # remove results less than MDL
       dplyr::filter(Lab_Reported_Result %<<% Lower_Quantification_Limit) |> # only look at results less than LQL
       dplyr::filter(Result_Detection_Condition != "Present Below Quantification Limit" |
-                      is.na(Result_Comment) |
+                      !stringr::str_detect(Result_Comment, "Lab reported a value of") |
                       !is.na(Result_Text)) |>
       nrow(),
     0)
@@ -89,7 +89,7 @@ test_that("Results table is formatted correctly by format_equis_results()", {
     results[[1]] |>
       dplyr::filter(!Lab_Reported_Result %<<% Lower_Quantification_Limit) |> # only look at results at least the LQL
       dplyr::filter(Result_Detection_Condition != "Detected And Quantified" |
-                      !is.na(Result_Comment) |
+                      stringr::str_detect(Result_Comment, "Lab reported a value of") |
                       is.na(Result_Text)) |>
       nrow(),
     0)
