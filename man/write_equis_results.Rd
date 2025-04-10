@@ -7,7 +7,6 @@
 write_equis_results(
   files,
   limits = imdccal::detection_limits,
-  qualifiers = imdccal::equis_qualifiers,
   format = c("xlsx", "csv"),
   destination_folder = "./",
   overwrite = FALSE,
@@ -18,8 +17,6 @@ write_equis_results(
 \item{files}{Path to .xlsx file delivered by CCAL. Use a character vector to specify multiple files.}
 
 \item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
-
-\item{qualifiers}{Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.}
 
 \item{format}{File format to export machine readable data to - either "xlsx" or "csv"}
 

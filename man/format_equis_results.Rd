@@ -7,7 +7,6 @@
 format_equis_results(
   file_paths,
   limits = imdccal::detection_limits,
-  qualifiers = imdccal::equis_qualifiers,
   concat = FALSE
 )
 }
@@ -16,8 +15,6 @@ format_equis_results(
 
 \item{limits}{Table with detection limits. By default, uses the version in the package. User-defined versions must have the same columns.}
 
-\item{qualifiers}{Table with flags and their meanings. By default, uses the version in the package. User-defined versions must have the same columns.}
-
 \item{concat}{If concat is set to TRUE, the output contains one table rather than one for every input file.
 By default, concat is set to FALSE, so the output contains separate tables for each file.
 If only one file path is supplied to the file_paths argument, this parameter does not affect the output.}
@@ -25,7 +22,7 @@ If only one file path is supplied to the file_paths argument, this parameter doe
 \value{
 The data formatted for input into the EQuIS system as the "Results" table.
 Note that after running this function, the user must still complete some of their own processing to prepare their data for EQuIS.
-For example, users must define Activity_ID, assign any additional flags, and modify Result_Status depending on the outcome of their quality control process.
+For example, users must define Activity_ID, assign any flags in Result_Qualifier, and modify Result_Status depending on the outcome of their quality control process.
 }
 \description{
 Create the results table of the EQuIS EDD.
