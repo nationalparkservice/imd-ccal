@@ -139,7 +139,12 @@ read_ccal <- function(files, concat = FALSE) {
       dplyr::filter(!grepl("date", parameter, ignore.case = TRUE)) %>%
       dplyr::mutate(repeat_measurement = stringr::str_extract(parameter, "^.*icate "),
                     flag_symbol = stringr::str_remove_all(value, "[\\d\\.]"),
-                    parameter = ifelse(is.na(repeat_measurement), parameter, stringr::str_remove(parameter, repeat_measurement)),
+                    parameter = ifelse(is.na(repeat_measurement), parameter, stringr::str_remove(parameter,
+                                                                                                 ifelse(is.na(repeat_measurement),
+                                                                                                        "#####",  # str_remove doesn't accept NA, so this "removes" a bogus string in order to get the unmodified parameter name back
+                                                                                                        repeat_measurement)
+                                                                                                 )
+                                       ),
                     parameter = trimws(parameter),
                     value = stringr::str_remove_all(value, "[^\\d\\.]"),
                     value = as.numeric(value),
